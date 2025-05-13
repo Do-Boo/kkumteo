@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최신 계획 피드 - 꿈터(KkumTeo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        :root {
+            --pastel-green: #A7D7C5;
+            --pastel-green-darker: #8EBFAC;
+            --pastel-green-focus-shadow: rgba(167, 215, 197, 0.3);
+            --form-input-border: #d1d5db;
+            /* Tailwind gray-300 */
+            --form-input-focus-border: var(--pastel-green);
+            --card-border-color: #e5e7eb;
+            /* Tailwind gray-200 */
+            --text-color-default: #1f2937;
+            /* Tailwind gray-800 */
+            --text-color-light: #374151;
+            /* Tailwind gray-700 */
+            --text-color-muted: #6b7280;
+            /* Tailwind gray-500 */
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 4px;
+            color: #4b5563;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:not(.active)::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .header-search-input {
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            width: 200px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        /* 새 게시물 작성 영역 (기존 폼 스타일과 유사하게) */
+        .new-post-form-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border: 1px solid var(--card-border-color);
+        }
+
+        .new-post-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .new-post-textarea:focus {
+            outline: none;
+            border-color: var(--pastel-green);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .new-post-actions {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-action-buttons button {
+            background: none;
+            border: none;
+            color: var(--text-color-muted);
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .post-action-buttons button:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .submit-post-button {
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .submit-post-button:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .submit-post-button:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+
+        /* 게시물 카드 스타일 (기존 plan-card 와 유사하게) */
+        .post-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            /* 그림자 약간 줄임 */
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--card-border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.07);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .post-avatar {
+            width: 40px;
+            /* 아바타 크기 */
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.75rem;
+            border: 2px solid var(--pastel-green-focus-shadow);
+            /* 아바타 테두리 */
+        }
+
+        .post-author-name {
+            font-weight: 600;
+            color: var(--text-color-default);
+        }
+
+        .post-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-color-muted);
+            margin-left: 0.5rem;
+        }
+
+        .post-options-button {
+            /* 더보기 버튼 (오른쪽 정렬) */
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-color-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .post-options-button:hover {
+            color: var(--text-color-default);
+        }
+
+        .post-content-text {
+            font-size: 0.925rem;
+            /* 본문 폰트 */
+            line-height: 1.7;
+            color: var(--text-color-light);
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+        }
+
+        .post-content-text a {
+            color: var(--pastel-green-darker);
+            text-decoration: underline;
+        }
+
+        .post-content-attachment img {
+            /* 첨부 이미지 스타일 */
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+            /* 본문과의 간격 */
+            border: 1px solid var(--card-border-color);
+        }
+
+        .pdf-preview-placeholder-card {
+            /* PDF 미리보기 예시 (카드 스타일) */
+            background-color: #f9fafb;
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-color-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--card-border-color);
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+        }
+
+        .pdf-preview-placeholder-card i {
+            color: #ef4444;
+        }
+
+
+        .post-footer {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-color-muted);
+            border-top: 1px solid var(--card-border-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+            /* 콘텐츠와의 간격 */
+        }
+
+        .post-footer-button {
+            background: none;
+            border: none;
+            color: var(--text-color-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: color 0.2s ease;
+        }
+
+        .post-footer-button:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .post-footer-button.liked {
+            color: var(--pastel-green-darker);
+            font-weight: 600;
+        }
+
+        .post-footer-button.liked i {
+            color: var(--pastel-green-darker);
+        }
+
+        .post-footer-button i {
+            font-size: 1rem;
+        }
+
+        .load-more-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: 500;
+            text-align: center;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .load-more-button:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        /* 로그인 팝업 (기존과 동일) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-button:hover {
+            color: #6b7280;
+        }
+
+        .modal-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-button {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-button-primary {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .modal-button-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-button-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        /* 피드 페이지 특정 스타일 */
+        .feed-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .feed-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+        }
+
+        .feed-description {
+            font-size: 1.125rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feed-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .feed-layout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .pagination-button {
+            padding: 0.5rem 0.75rem;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-button:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .pagination-button.active {
+            background-color: var(--pastel-green);
+            color: white;
+            border-color: var(--pastel-green);
+            font-weight: 500;
+        }
+
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            .feed-layout-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .feed-layout-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link active">계획</a>
+                    <a href="calendar.html" class="nav-link">달력</a>
+                    <a href="community.html" class="nav-link">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" placeholder="검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">홍길동님</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="feed-header">
+            <h1 class="feed-title">최신 계획 피드</h1>
+            <p class="feed-description">다른 사용자들의 다양한 계획과 아이디어를 살펴보세요.</p>
+        </div>
+
+        <div class="feed-filters">
+            <button class="btn btn-primary">전체</button>
+            <button class="btn btn-secondary">여행</button>
+            <button class="btn btn-secondary">공부</button>
+            <button class="btn btn-secondary">취미</button>
+            <button class="btn btn-secondary">운동</button>
+            <button class="btn btn-secondary">재테크</button>
+            <button class="btn btn-secondary">취업/직장</button>
+        </div>
+
+        <div class="feed-layout-container">
+            <!-- 피드 아이템 1 -->
+            <div class="card">
+                <a href="detail_page.html">
+                    <img src="https://placehold.co/600x400/C8E6C9/81C784?text=여행+계획" alt="제주도 여행 계획" class="card-image">
+                </a>
+                <div class="card-content">
+                    <h3 class="card-title"><a href="detail_page.html">제주도 일주일 여행 계획</a></h3>
+                    <div class="card-tags">
+                        <span class="card-tag">#여행</span>
+                        <span class="card-tag">#제주도</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/32x32/A0AEC0/FFFFFF?text=김" alt="사용자 아바타"
+                                class="avatar avatar-sm mr-2">
+                            <span class="text-gray-600">여행자</span>
+                        </div>
+                        <span class="text-gray-500">25.01.01</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 피드 아이템 2 -->
+            <div class="card">
+                <a href="detail_page.html">
+                    <img src="https://placehold.co/600x400/BBDEFB/64B5F6?text=공부+계획" alt="토익 공부 계획" class="card-image">
+                </a>
+                <div class="card-content">
+                    <h3 class="card-title"><a href="detail_page.html">1년 안에 토익 900점 달성 계획</a></h3>
+                    <div class="card-tags">
+                        <span class="card-tag">#공부</span>
+                        <span class="card-tag">#어학</span>
+                        <span class="card-tag">#토익</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/32x32/F8BBD0/EC407A?text=이" alt="사용자 아바타"
+                                class="avatar avatar-sm mr-2">
+                            <span class="text-gray-600">영어학습자</span>
+                        </div>
+                        <span class="text-gray-500">25.01.05</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 피드 아이템 3 -->
+            <div class="card">
+                <a href="detail_page.html">
+                    <img src="https://placehold.co/600x400/FFF9C4/FFF176?text=취미+계획" alt="그림 배우기 계획" class="card-image">
+                </a>
+                <div class="card-content">
+                    <h3 class="card-title"><a href="detail_page.html">주말 그림 배우기 - 6개월 계획</a></h3>
+                    <div class="card-tags">
+                        <span class="card-tag">#취미</span>
+                        <span class="card-tag">#그림</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/32x32/BBDEFB/64B5F6?text=박" alt="사용자 아바타"
+                                class="avatar avatar-sm mr-2">
+                            <span class="text-gray-600">아트러버</span>
+                        </div>
+                        <span class="text-gray-500">25.01.10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 추가 피드 아이템들 -->
+            <!-- 필요한 만큼 카드를 추가할 수 있습니다 -->
+        </div>
+
+        <div class="pagination">
+            <button class="pagination-button" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="pagination-button active">1</button>
+            <button class="pagination-button">2</button>
+            <button class="pagination-button">3</button>
+            <button class="pagination-button">4</button>
+            <button class="pagination-button">5</button>
+            <button class="pagination-button"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 py-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-500 text-sm">
+                <p>&copy; 2023 꿈터(KkumTeo). 모든 권리 보유.</p>
+                <p class="mt-2">나만의 계획으로 꿈을 이루어가는 공간</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 필터 버튼 기능
+        const filterButtons = document.querySelectorAll('.feed-filters .btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('btn-primary'));
+                filterButtons.forEach(b => b.classList.add('btn-secondary'));
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+            });
+        });
+
+        // 페이지네이션 기능
+        const pageButtons = document.querySelectorAll('.pagination-button:not(:first-child):not(:last-child)');
+        pageButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                pageButtons.forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

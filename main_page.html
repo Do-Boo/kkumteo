@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>꿈터(KkumTeo) - 나의 계획 둘러보기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <script src="includes/script.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        :root {
+            --pastel-green: #A7D7C5;
+            --pastel-green-darker: #8EBFAC;
+            --pastel-green-focus-shadow: rgba(167, 215, 197, 0.3);
+            --form-input-border: #d1d5db;
+            --form-input-focus-border: var(--pastel-green);
+        }
+
+        .filter-button {
+            transition: all 0.3s ease;
+        }
+
+        .filter-button.active {
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: bold;
+        }
+
+        .filter-button:not(.active) {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .filter-button:not(.active):hover {
+            background-color: #dde2e6;
+        }
+
+        .creator-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #f3f4f6;
+            transition: transform 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creator-card:hover {
+            transform: translateY(-3px);
+            border-color: #e5e7eb;
+        }
+
+        .creator-card.hidden-by-search {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .creator-card-image {
+            width: 100%;
+            height: 15rem;
+            object-fit: cover;
+        }
+
+        .creator-card-content {
+            padding: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .creator-card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.625rem;
+            line-height: 1.3;
+        }
+
+        .creator-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-bottom: 0.875rem;
+            flex-grow: 1;
+        }
+
+        .creator-card-tag {
+            background-color: transparent;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.125rem 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .creator-card-tag:hover {
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .creator-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.625rem;
+            border-top: 1px solid #f3f4f6;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .creator-avatar {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .creator-name {
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 4px;
+            color: #4b5563;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .header-search-input {
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            width: 200px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .text-theme-green {
+            color: var(--pastel-green);
+            transition: color 0.2s ease;
+        }
+
+        .text-theme-green:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        /* 로그인 팝업 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 반투명 검은색 배경 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            /* 다른 요소들 위에 표시 */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            /* 팝업 최대 너비 */
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            /* text-2xl */
+            font-weight: 600;
+            color: #1f2937;
+            /* text-gray-800 */
+        }
+
+        .modal-close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #9ca3af;
+            /* text-gray-400 */
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-button:hover {
+            color: #6b7280;
+            /* text-gray-500 */
+        }
+
+        .modal-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-label {
+            display: block;
+            font-size: 0.875rem;
+            /* text-sm */
+            font-weight: 500;
+            color: #374151;
+            /* text-gray-700 */
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-button {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-button-primary {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .modal-button-secondary {
+            background-color: #e5e7eb;
+            /* gray-200 */
+            color: #374151;
+            /* gray-700 */
+        }
+
+        .modal-button-secondary:hover {
+            background-color: #d1d5db;
+            /* gray-300 */
+        }
+
+        /* 알림 스타일 추가 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            color: white;
+            max-width: 300px;
+            transform: translateY(-30px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            background-color: #10b981;
+        }
+
+        .notification-error {
+            background-color: #ef4444;
+        }
+
+        .notification-warning {
+            background-color: #f59e0b;
+        }
+
+        .notification-info {
+            background-color: #3b82f6;
+        }
+
+        /* 로딩 스피너 스타일 */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            vertical-align: -0.125em;
+            border: 0.25em solid var(--pastel-green);
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link active">계획</a>
+                    <a href="calendar.html" class="nav-link">달력</a>
+                    <a href="community.html" class="nav-link">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="searchInput" placeholder="검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <div id="userSection">
+                        <button id="loginButton"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">로그인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <div class="flex space-x-2 mb-4 sm:mb-0">
+                    <button class="filter-button active px-6 py-2 rounded-lg text-sm font-medium"
+                        data-filter="popular">인기 계획</button>
+                    <button class="filter-button px-6 py-2 rounded-lg text-sm font-medium" data-filter="latest">최신
+                        계획</button>
+                    <button class="filter-button px-6 py-2 rounded-lg text-sm font-medium" data-filter="recommended">추천
+                        계획</button>
+                </div>
+                <a href="#" class="text-sm font-medium text-theme-green" id="viewAllPlansLink">
+                    전체 계획 보기 <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="creatorGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div id="loadingPlans" class="col-span-full my-12 text-center">
+                <div class="spinner-border text-primary mx-auto" role="status"></div>
+                <p class="mt-4 text-gray-600">계획 목록을 불러오는 중...</p>
+            </div>
+
+            <div id="noPlansMessage" class="col-span-full my-12 text-center hidden">
+                <i class="fas fa-folder-open fa-3x text-gray-400 mb-4"></i>
+                <p class="text-xl text-gray-600 mb-2">등록된 계획이 없습니다.</p>
+                <p class="text-gray-500">새로운 계획을 작성해 보세요!</p>
+                <a href="plan_editor.html"
+                    class="mt-4 inline-block px-4 py-2 text-sm font-medium text-white bg-[var(--pastel-green)] hover:bg-[var(--pastel-green-darker)] rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>새 계획서 만들기
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">로그인</h2>
+                <button id="closeLoginModalButton" class="modal-close-button" aria-label="닫기">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="modal-input-group">
+                    <label for="username" class="modal-label">아이디</label>
+                    <input type="text" id="username" name="username" class="modal-input" required>
+                </div>
+                <div class="modal-input-group">
+                    <label for="password" class="modal-label">비밀번호</label>
+                    <input type="password" id="password" name="password" class="modal-input" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelLoginButton" class="modal-button modal-button-secondary">취소</button>
+                    <button type="submit" class="modal-button modal-button-primary">로그인</button>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="#" class="text-sm text-theme-green hover:underline">아이디/비밀번호 찾기</a>
+                    <span class="text-sm text-gray-400 mx-1">|</span>
+                    <a href="#" class="text-sm text-theme-green hover:underline">회원가입</a>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="kakaoLoginBtn"
+                        class="w-full bg-yellow-300 text-gray-800 py-2 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-comment mr-2"></i> 카카오 계정으로 로그인
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            let currentFilter = 'popular';
+            let isLoading = false;
+            let plans = [];
+            let currentUser = null;
+
+            const creatorGrid = document.getElementById('creatorGrid');
+            const loadingPlans = document.getElementById('loadingPlans');
+            const noPlansMessage = document.getElementById('noPlansMessage');
+            const filterButtons = document.querySelectorAll('.filter-button');
+            const searchInput = document.getElementById('searchInput');
+            const userSection = document.getElementById('userSection');
+            const loginButton = document.getElementById('loginButton');
+            const loginModal = document.getElementById('loginModal');
+            const closeLoginModalButton = document.getElementById('closeLoginModalButton');
+            const cancelLoginButton = document.getElementById('cancelLoginButton');
+            const loginForm = document.getElementById('loginForm');
+            const kakaoLoginBtn = document.getElementById('kakaoLoginBtn');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentFilter = button.getAttribute('data-filter');
+                    loadPlans();
+                });
+            });
+
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const filteredPlans = searchTerm === '' ? plans : plans.filter(plan => {
+                    const titleMatch = plan.title.toLowerCase().includes(searchTerm);
+                    const tagMatch = plan.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                    return titleMatch || tagMatch;
+                });
+
+                renderPlans(filteredPlans);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', performSearch);
+            }
+
+            async function loadPlans() {
+                if (isLoading) return;
+
+                isLoading = true;
+                loadingPlans.classList.remove('hidden');
+                noPlansMessage.classList.add('hidden');
+
+                const existingCards = creatorGrid.querySelectorAll('.creator-card');
+                existingCards.forEach(card => card.remove());
+
+                try {
+                    let sortOption = 'latest';
+                    switch (currentFilter) {
+                        case 'popular':
+                            sortOption = 'popular';
+                            break;
+                        case 'latest':
+                            sortOption = 'latest';
+                            break;
+                        case 'recommended':
+                            sortOption = 'recommended';
+                            break;
+                    }
+
+                    const response = await KkumTeo.PlanManager.getPlans({
+                        visibility: 'public',
+                    }, 20, 0, sortOption);
+
+                    if (response.success) {
+                        plans = response.plans;
+                        renderPlans(plans);
+                    } else {
+                        KkumTeo.UIUtils.showNotification(response.message || '계획을 불러오는데 실패했습니다.', 'error');
+                        noPlansMessage.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('계획 로드 오류:', error);
+                    KkumTeo.UIUtils.showNotification('계획을 불러오는데 실패했습니다.', 'error');
+                    noPlansMessage.classList.remove('hidden');
+                } finally {
+                    loadingPlans.classList.add('hidden');
+                    isLoading = false;
+                }
+            }
+
+            function renderPlans(plansToRender) {
+                loadingPlans.classList.add('hidden');
+
+                if (plansToRender.length === 0) {
+                    noPlansMessage.classList.remove('hidden');
+                    return;
+                }
+
+                noPlansMessage.classList.add('hidden');
+
+                const existingCards = creatorGrid.querySelectorAll('.creator-card');
+                existingCards.forEach(card => card.remove());
+
+                plansToRender.forEach(plan => {
+                    const card = createPlanCard(plan);
+                    creatorGrid.insertBefore(card, loadingPlans);
+                });
+            }
+
+            function createPlanCard(plan) {
+                const card = document.createElement('div');
+                card.className = 'card creator-card';
+
+                const tagsHtml = plan.tags.map(tag =>
+                    `<span class="card-tag">#${tag}</span>`
+                ).join('');
+
+                const formattedDate = KkumTeo.UIUtils.formatDate(plan.created_at, 'YY.MM.DD');
+
+                card.innerHTML = `
+                    <a href="detail_page.html?id=${plan.id}">
+                        <img src="${plan.image_url || 'https://placehold.co/600x400/E0E0E0/B0B0B0?text=계획'}" 
+                             alt="${plan.title}" class="card-image creator-card-image">
+                    </a>
+                    <div class="card-content creator-card-content">
+                        <h3 class="card-title creator-card-title">
+                            <a href="detail_page.html?id=${plan.id}">${plan.title}</a>
+                        </h3>
+                        <div class="card-tags creator-card-tags">
+                            ${tagsHtml}
+                        </div>
+                        <div class="card-footer creator-card-footer">
+                            <div class="creator-info">
+                                <img src="${plan.user_avatar || 'https://placehold.co/24x24/A0AEC0/FFFFFF?text=사용자'}" 
+                                     alt="${plan.user_name}" class="avatar avatar-sm creator-avatar">
+                                <span class="creator-name">${plan.user_name}</span>
+                            </div>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            async function loadCurrentUser() {
+                try {
+                    const response = await KkumTeo.AuthManager.getCurrentUser();
+
+                    if (response.success && response.user) {
+                        currentUser = response.user;
+
+                        userSection.innerHTML = `
+                            <div class="relative group">
+                                <a href="my_plans.html" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                    <span>${currentUser.name}님</span>
+                                </a>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+                                    <a href="my_plans.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">내 계획</a>
+                                    <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+                                </div>
+                            </div>
+                        `;
+
+                        document.getElementById('logoutButton').addEventListener('click', async function (e) {
+                            e.preventDefault();
+
+                            try {
+                                const response = await KkumTeo.AuthManager.logout();
+
+                                if (response.success) {
+                                    KkumTeo.UIUtils.showNotification('로그아웃 되었습니다.', 'success');
+                                    location.reload();
+                                } else {
+                                    KkumTeo.UIUtils.showNotification(response.message || '로그아웃 실패', 'error');
+                                }
+                            } catch (error) {
+                                console.error('로그아웃 오류:', error);
+                                KkumTeo.UIUtils.showNotification('로그아웃 중 오류가 발생했습니다.', 'error');
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('사용자 정보 로드 오류:', error);
+                }
+            }
+
+            function openLoginModal() {
+                if (loginModal) loginModal.classList.add('active');
+            }
+
+            function closeLoginModal() {
+                if (loginModal) loginModal.classList.remove('active');
+            }
+
+            if (loginButton) {
+                loginButton.addEventListener('click', openLoginModal);
+            }
+
+            if (closeLoginModalButton) {
+                closeLoginModalButton.addEventListener('click', closeLoginModal);
+            }
+
+            if (cancelLoginButton) {
+                cancelLoginButton.addEventListener('click', closeLoginModal);
+            }
+
+            if (loginModal) {
+                loginModal.addEventListener('click', function (event) {
+                    if (event.target === loginModal) {
+                        closeLoginModal();
+                    }
+                });
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function (event) {
+                    event.preventDefault();
+
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+
+                    try {
+                        const response = await KkumTeo.AuthManager.login(username, password);
+
+                        if (response.success) {
+                            KkumTeo.UIUtils.showNotification('로그인 성공!', 'success');
+                            closeLoginModal();
+                            loadCurrentUser();
+                        } else {
+                            KkumTeo.UIUtils.showNotification(response.message || '로그인 실패', 'error');
+                        }
+                    } catch (error) {
+                        console.error('로그인 오류:', error);
+                        KkumTeo.UIUtils.showNotification('로그인 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            }
+
+            if (kakaoLoginBtn) {
+                kakaoLoginBtn.addEventListener('click', function () {
+                    const redirectUri = encodeURIComponent(window.location.origin + '/api/auth.php?action=kakao_callback');
+                    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=YOUR_KAKAO_APP_KEY&redirect_uri=${redirectUri}&response_type=code`;
+
+                    window.location.href = kakaoAuthUrl;
+                });
+            }
+
+            async function init() {
+                await loadCurrentUser();
+                await loadPlans();
+            }
+
+            init();
+        });
+    </script>
+
+</body>
+
+</html>

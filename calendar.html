@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달력 - 꿈터(KkumTeo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <script src="includes/script.js"></script>
+    <style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            background-color: white;
+            padding: 0.5rem;
+            position: relative;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 500;
+            padding: 0.5rem;
+            background-color: #f3f4f6;
+        }
+
+        .calendar-day-number {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-day.today {
+            background-color: #f0fdf4;
+        }
+
+        .calendar-day.today .calendar-day-number {
+            background-color: var(--pastel-green);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-day.other-month {
+            background-color: #f9fafb;
+        }
+
+        .calendar-day.other-month .calendar-day-number {
+            color: #9ca3af;
+        }
+
+        .calendar-event {
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            background-color: var(--pastel-green);
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-event:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .calendar-event.personal {
+            background-color: #93c5fd;
+        }
+
+        .calendar-event.personal:hover {
+            background-color: #60a5fa;
+        }
+
+        .calendar-event.deadline {
+            background-color: #fca5a5;
+        }
+
+        .calendar-event.deadline:hover {
+            background-color: #f87171;
+        }
+
+        .view-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-button {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            background-color: #f3f4f6;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .view-button.active {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link">계획</a>
+                    <a href="calendar.html" class="nav-link active">달력</a>
+                    <a href="community.html" class="nav-link">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="searchInput" placeholder="검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <a href="my_plans.html"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">홍길동님</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">계획 달력</h1>
+                <div class="flex items-center space-x-4">
+                    <div class="view-switcher">
+                        <button class="view-button active" data-view="month">월간</button>
+                        <button class="view-button" data-view="week">주간</button>
+                        <button class="view-button" data-view="day">일간</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="currentMonth" class="text-lg font-medium">2023년 6월</span>
+                        <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-wrapper">
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">일</div>
+                    <div class="calendar-day-header">월</div>
+                    <div class="calendar-day-header">화</div>
+                    <div class="calendar-day-header">수</div>
+                    <div class="calendar-day-header">목</div>
+                    <div class="calendar-day-header">금</div>
+                    <div class="calendar-day-header">토</div>
+
+                    <!-- 첫째 주 -->
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">28</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">29</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">30</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">31</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">1</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">2</div>
+                        <div class="calendar-event">웹 디자인 완료하기</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">3</div>
+                    </div>
+
+                    <!-- 둘째 주 -->
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">5</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">6</div>
+                        <div class="calendar-event personal">미팅 준비</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">7</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">8</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">9</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">10</div>
+                        <div class="calendar-event deadline">프로젝트 제출</div>
+                    </div>
+
+                    <!-- 셋째 주 -->
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">12</div>
+                        <div class="calendar-event">팀 미팅</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">13</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">14</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="calendar-day-number">15</div>
+                        <div class="calendar-event">API 개발</div>
+                        <div class="calendar-event personal">운동</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">16</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">17</div>
+                    </div>
+
+                    <!-- 넷째 주 -->
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">19</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">20</div>
+                        <div class="calendar-event deadline">발표 준비</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">21</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">22</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">23</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">24</div>
+                    </div>
+
+                    <!-- 다섯째 주 -->
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">25</div>
+                        <div class="calendar-event">코드 리뷰</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">26</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">27</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">28</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">29</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="calendar-day-number">30</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="calendar-day-number">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold mb-3">다가오는 일정</h2>
+                <ul class="space-y-2">
+                    <li class="p-3 bg-gray-50 rounded-md flex items-start">
+                        <div class="w-3 h-3 rounded-full bg-pastel-green mt-1 mr-3"></div>
+                        <div>
+                            <div class="font-medium">API 개발</div>
+                            <div class="text-sm text-gray-500">오늘 (6월 15일)</div>
+                        </div>
+                    </li>
+                    <li class="p-3 bg-gray-50 rounded-md flex items-start">
+                        <div class="w-3 h-3 rounded-full bg-blue-300 mt-1 mr-3"></div>
+                        <div>
+                            <div class="font-medium">운동</div>
+                            <div class="text-sm text-gray-500">오늘 (6월 15일)</div>
+                        </div>
+                    </li>
+                    <li class="p-3 bg-gray-50 rounded-md flex items-start">
+                        <div class="w-3 h-3 rounded-full bg-red-300 mt-1 mr-3"></div>
+                        <div>
+                            <div class="font-medium">발표 준비</div>
+                            <div class="text-sm text-gray-500">5일 후 (6월 20일)</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 달력 기능 구현
+        document.addEventListener('DOMContentLoaded', async function () {
+            // 현재 로그인 사용자 정보
+            let currentUser = null;
+
+            // 달력 상태 정보
+            const months = [
+                "1월", "2월", "3월", "4월", "5월", "6월",
+                "7월", "8월", "9월", "10월", "11월", "12월"
+            ];
+            let currentDate = new Date();
+            let currentView = 'month'; // 'month', 'week', 'day'
+            let calendarEvents = []; // 일정 데이터를 저장할 배열
+
+            // DOM 요소
+            const currentMonthDisplay = document.getElementById('currentMonth');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const viewButtons = document.querySelectorAll('.view-button');
+            const calendarGrid = document.querySelector('.calendar-grid');
+            const upcomingEventsList = document.querySelector('main .mt-6 ul');
+
+            // 사용자 정보 로드
+            async function loadCurrentUser() {
+                try {
+                    const response = await KkumTeo.AuthManager.getCurrentUser();
+
+                    if (response.success && response.user) {
+                        currentUser = response.user;
+
+                        // 로그인 표시 업데이트
+                        const userSection = document.querySelector('header .flex.items-center.space-x-3 a');
+                        if (userSection) {
+                            userSection.textContent = `${currentUser.name}님`;
+
+                            // 로그아웃 드롭다운 추가
+                            userSection.parentElement.innerHTML = `
+                                <div class="relative group">
+                                    <a href="my_plans.html" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                        ${currentUser.name}님
+                                    </a>
+                                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+                                        <a href="my_plans.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">내 계획</a>
+                                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+                                    </div>
+                                </div>
+                            `;
+
+                            // 로그아웃 버튼 이벤트 리스너
+                            document.getElementById('logoutButton').addEventListener('click', async function (e) {
+                                e.preventDefault();
+                                try {
+                                    const response = await KkumTeo.AuthManager.logout();
+                                    if (response.success) {
+                                        KkumTeo.UIUtils.showNotification('로그아웃 되었습니다.', 'success');
+                                        location.href = 'main_page.html';
+                                    }
+                                } catch (error) {
+                                    console.error('로그아웃 오류:', error);
+                                }
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('사용자 정보 로드 오류:', error);
+                }
+            }
+
+            // 현재 달력 표시 업데이트
+            function updateMonthDisplay() {
+                currentMonthDisplay.textContent = `${currentDate.getFullYear()}년 ${months[currentDate.getMonth()]}`;
+            }
+
+            // 일정 데이터 로드
+            async function loadEvents() {
+                try {
+                    // 달력 기간에 해당하는 계획 정보 가져오기
+                    const year = currentDate.getFullYear();
+                    const month = currentDate.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    // API 호출 시뮬레이션 (실제 API가 구현되면 이 부분을 연결)
+                    // const response = await KkumTeo.PlanManager.getCalendarEvents(firstDay, lastDay);
+
+                    // 현재는 더미 데이터로 대체
+                    const dummyEvents = [
+                        {
+                            id: 1,
+                            title: "웹 디자인 완료하기",
+                            start_date: new Date(year, month, 2),
+                            event_type: "plan",
+                            plan_id: 1
+                        },
+                        {
+                            id: 2,
+                            title: "미팅 준비",
+                            start_date: new Date(year, month, 6),
+                            event_type: "personal",
+                            plan_id: 2
+                        },
+                        {
+                            id: 3,
+                            title: "프로젝트 제출",
+                            start_date: new Date(year, month, 10),
+                            event_type: "deadline",
+                            plan_id: 3
+                        },
+                        {
+                            id: 4,
+                            title: "팀 미팅",
+                            start_date: new Date(year, month, 12),
+                            event_type: "plan",
+                            plan_id: 4
+                        },
+                        {
+                            id: 5,
+                            title: "API 개발",
+                            start_date: new Date(year, month, 15),
+                            event_type: "plan",
+                            plan_id: 5
+                        },
+                        {
+                            id: 6,
+                            title: "운동",
+                            start_date: new Date(year, month, 15),
+                            event_type: "personal",
+                            plan_id: null
+                        },
+                        {
+                            id: 7,
+                            title: "발표 준비",
+                            start_date: new Date(year, month, 20),
+                            event_type: "deadline",
+                            plan_id: 6
+                        },
+                        {
+                            id: 8,
+                            title: "코드 리뷰",
+                            start_date: new Date(year, month, 25),
+                            event_type: "plan",
+                            plan_id: 7
+                        }
+                    ];
+
+                    calendarEvents = dummyEvents;
+                    renderCalendar();
+                    renderUpcomingEvents();
+                } catch (error) {
+                    console.error('일정 데이터 로드 오류:', error);
+                    KkumTeo.UIUtils.showNotification('일정을 불러오는데 실패했습니다.', 'error');
+                }
+            }
+
+            // 달력 렌더링
+            function renderCalendar() {
+                // 기존 달력 콘텐츠 제거 (헤더 제외)
+                const dayElements = calendarGrid.querySelectorAll('.calendar-day');
+                dayElements.forEach(day => day.remove());
+
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+
+                // 현재 월의 첫날과 마지막 날
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+
+                // 달력 시작일 (이전 달의 마지막 주)
+                const startDay = new Date(firstDay);
+                startDay.setDate(firstDay.getDate() - firstDay.getDay());
+
+                // 현재 날짜
+                const today = new Date();
+
+                // 달력 채우기 (6주 = 42일)
+                for (let i = 0; i < 42; i++) {
+                    const date = new Date(startDay);
+                    date.setDate(startDay.getDate() + i);
+
+                    const isOtherMonth = date.getMonth() !== month;
+                    const isToday = date.toDateString() === today.toDateString();
+
+                    // 날짜 요소 생성
+                    const dayElement = document.createElement('div');
+                    dayElement.className = `calendar-day${isOtherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}`;
+
+                    // 날짜 숫자 추가
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'calendar-day-number';
+                    dayNumber.textContent = date.getDate();
+                    dayElement.appendChild(dayNumber);
+
+                    // 해당 날짜의 이벤트 추가
+                    const dayEvents = calendarEvents.filter(event =>
+                        event.start_date.getDate() === date.getDate() &&
+                        event.start_date.getMonth() === date.getMonth() &&
+                        event.start_date.getFullYear() === date.getFullYear()
+                    );
+
+                    dayEvents.forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = `calendar-event${event.event_type ? ' ' + event.event_type : ''}`;
+                        eventElement.textContent = event.title;
+                        eventElement.dataset.eventId = event.id;
+                        dayElement.appendChild(eventElement);
+
+                        // 클릭 이벤트 (계획 상세로 이동)
+                        eventElement.addEventListener('click', () => {
+                            if (event.plan_id) {
+                                window.location.href = `detail_page.html?id=${event.plan_id}`;
+                            } else {
+                                alert(`이벤트: ${event.title}`);
+                            }
+                        });
+                    });
+
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+
+            // 다가오는 일정 렌더링
+            function renderUpcomingEvents() {
+                if (!upcomingEventsList) return;
+
+                // 기존 목록 항목 제거
+                upcomingEventsList.innerHTML = '';
+
+                // 오늘 이후의 이벤트 필터링
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const upcomingEvents = calendarEvents
+                    .filter(event => event.start_date >= today)
+                    .sort((a, b) => a.start_date - b.start_date)
+                    .slice(0, 5); // 최대 5개만 표시
+
+                if (upcomingEvents.length === 0) {
+                    const noEventsMessage = document.createElement('li');
+                    noEventsMessage.className = 'p-3 bg-gray-50 rounded-md';
+                    noEventsMessage.innerHTML = '<p class="text-center text-gray-500">다가오는 일정이 없습니다.</p>';
+                    upcomingEventsList.appendChild(noEventsMessage);
+                    return;
+                }
+
+                // 각 이벤트에 대한 리스트 항목 생성
+                upcomingEvents.forEach(event => {
+                    const li = document.createElement('li');
+                    li.className = 'p-3 bg-gray-50 rounded-md flex items-start';
+
+                    // 이벤트 유형에 따른 색상
+                    let dotColor = 'bg-pastel-green';
+                    if (event.event_type === 'personal') dotColor = 'bg-blue-300';
+                    if (event.event_type === 'deadline') dotColor = 'bg-red-300';
+
+                    // 날짜 차이 계산
+                    const dateDiff = Math.floor((event.start_date - today) / (1000 * 60 * 60 * 24));
+                    let dateText = '';
+
+                    if (dateDiff === 0) {
+                        dateText = '오늘';
+                    } else if (dateDiff === 1) {
+                        dateText = '내일';
+                    } else {
+                        dateText = `${dateDiff}일 후`;
+                    }
+
+                    // 날짜 형식화
+                    const formattedDate = `${event.start_date.getMonth() + 1}월 ${event.start_date.getDate()}일`;
+
+                    li.innerHTML = `
+                        <div class="w-3 h-3 rounded-full ${dotColor} mt-1 mr-3"></div>
+                        <div>
+                            <div class="font-medium">${event.title}</div>
+                            <div class="text-sm text-gray-500">${dateText} (${formattedDate})</div>
+                        </div>
+                    `;
+
+                    // 클릭 이벤트
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', () => {
+                        if (event.plan_id) {
+                            window.location.href = `detail_page.html?id=${event.plan_id}`;
+                        }
+                    });
+
+                    upcomingEventsList.appendChild(li);
+                });
+            }
+
+            // 이전/다음 달 이동 버튼
+            if (prevMonthBtn) {
+                prevMonthBtn.addEventListener('click', function () {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    updateMonthDisplay();
+                    loadEvents(); // 다른 달의 이벤트 데이터 로드
+                });
+            }
+
+            if (nextMonthBtn) {
+                nextMonthBtn.addEventListener('click', function () {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    updateMonthDisplay();
+                    loadEvents(); // 다른 달의 이벤트 데이터 로드
+                });
+            }
+
+            // 뷰 전환 버튼
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    // 현재 활성화된 버튼에서 active 클래스 제거
+                    document.querySelector('.view-button.active').classList.remove('active');
+                    // 클릭된 버튼에 active 클래스 추가
+                    this.classList.add('active');
+
+                    currentView = this.getAttribute('data-view');
+                    // 실제 구현에서는 뷰에 따라 다른 형태의 달력을 표시
+                    // 현재는 월간 뷰만 구현
+                    console.log(`${currentView} 뷰로 전환`);
+                });
+            });
+
+            // 초기화
+            updateMonthDisplay();
+            await loadCurrentUser();
+            await loadEvents();
+        });
+    </script>
+</body>
+
+</html>
+
+</html>

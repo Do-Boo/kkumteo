@@ -1,0 +1,349 @@
+/* 
+ * 공통 스타일 시트 - 꿈터(KkumTeo)
+ * 모든 페이지에서 공유되는 스타일을 정의합니다.
+ * 작성일: 2023-05-10
+ */
+
+/* 기본 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f8f9fa;
+    color: #374151;
+}
+
+/* 색상 변수 */
+:root {
+    --pastel-green: #A7D7C5;
+    --pastel-green-darker: #8EBFAC;
+    --pastel-green-focus-shadow: rgba(167, 215, 197, 0.3);
+    --form-input-border: #d1d5db;
+    --form-input-focus-border: var(--pastel-green);
+    --form-button-bg: var(--pastel-green);
+    --form-button-hover-bg: var(--pastel-green-darker);
+    --form-button-secondary-bg: #e5e7eb;
+    --form-button-secondary-hover-bg: #d1d5db;
+    --form-button-secondary-text: #374151;
+    --danger-red: #ef4444;
+    --danger-red-darker: #dc2626;
+}
+
+/* 헤더 및 네비게이션 스타일 */
+.nav-link {
+    position: relative;
+    padding-bottom: 4px;
+    color: #4b5563;
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--pastel-green-darker);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--pastel-green);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+.header-search-input {
+    border: 1px solid var(--form-input-border);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    width: 200px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header-search-input:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border);
+    box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--pastel-green);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--pastel-green-darker);
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background-color: #d1d5db;
+}
+
+.btn-danger {
+    background-color: #f3f4f6;
+    color: var(--danger-red);
+    border: 1px solid var(--danger-red);
+}
+
+.btn-danger:hover {
+    background-color: #fee2e2;
+    color: var(--danger-red-darker);
+}
+
+/* 텍스트 스타일 */
+.text-theme-green {
+    color: var(--pastel-green);
+    transition: color 0.2s ease;
+}
+
+.text-theme-green:hover {
+    color: var(--pastel-green-darker);
+}
+
+/* 카드 공통 스타일 */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid #f3f4f6;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    border-color: #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-content {
+    padding: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.625rem;
+    line-height: 1.3;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 0.875rem;
+    flex-grow: 1;
+}
+
+.card-tag {
+    background-color: transparent;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.125rem 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.25rem;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.card-tag:hover {
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.625rem;
+    border-top: 1px solid #f3f4f6;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.card-image {
+    width: 100%;
+    height: 15rem;
+    object-fit: cover;
+}
+
+/* 아바타 */
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-sm {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+.avatar-md {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.avatar-lg {
+    width: 5rem;
+    height: 5rem;
+}
+
+/* 폼 요소 */
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--form-input-border);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    color: #374151;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border);
+    box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-input-group {
+    margin-bottom: 1.5rem;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close-button:hover {
+    color: #6b7280;
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* 반응형 설정 */
+@media (max-width: 640px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .card-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 - 꿈터(KkumTeo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .community-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .community-tab {
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+            color: #4b5563;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .community-tab:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .community-tab.active {
+            color: var(--pastel-green);
+            border-bottom-color: var(--pastel-green);
+        }
+
+        .post-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .badge-green {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-blue {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .reaction-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .reaction-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .reaction-button i {
+            margin-right: 0.375rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link">계획</a>
+                    <a href="calendar.html" class="nav-link">달력</a>
+                    <a href="community.html" class="nav-link active">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="searchInput" placeholder="검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <a href="my_plans.html"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">홍길동님</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- 메인 컨텐츠 -->
+            <div class="w-full md:w-2/3">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">커뮤니티</h1>
+
+                <!-- 탭 메뉴 -->
+                <div class="community-tabs">
+                    <div class="community-tab active" data-tab="all">전체 글</div>
+                    <div class="community-tab" data-tab="questions">질문</div>
+                    <div class="community-tab" data-tab="tips">꿀팁</div>
+                    <div class="community-tab" data-tab="achievements">성취</div>
+                </div>
+
+                <!-- 글 작성 버튼 -->
+                <div class="flex justify-between items-center mb-6">
+                    <div class="text-sm text-gray-500">총 24개의 게시글이 있습니다.</div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-pen mr-1"></i> 글쓰기
+                    </button>
+                </div>
+
+                <!-- 게시글 목록 -->
+                <div class="space-y-4">
+                    <!-- 게시글 1 -->
+                    <div class="bg-white rounded-lg shadow-sm p-5 post-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <img src="https://picsum.photos/id/1005/40/40" alt="프로필" class="avatar avatar-sm">
+                                <div>
+                                    <div class="font-medium">김철수</div>
+                                    <div class="text-xs text-gray-500">2023.06.15 · 조회 128</div>
+                                </div>
+                            </div>
+                            <div class="badge badge-green">꿀팁</div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">효과적인 계획 관리를 위한 5가지 방법</h3>
+                        <p class="text-gray-600 mb-4">안녕하세요! 저는 3년간 계획을 세우고 실천하며 배운 꿀팁을 공유하려 합니다. 먼저 목표를 명확히 하는 것이
+                            중요합니다. 그 다음은...</p>
+                        <div class="flex text-sm text-gray-500 gap-3">
+                            <div class="reaction-button">
+                                <i class="far fa-thumbs-up"></i> 좋아요 24
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-comment"></i> 댓글 8
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-bookmark"></i> 저장
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 게시글 2 -->
+                    <div class="bg-white rounded-lg shadow-sm p-5 post-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <img src="https://picsum.photos/id/1012/40/40" alt="프로필" class="avatar avatar-sm">
+                                <div>
+                                    <div class="font-medium">박지민</div>
+                                    <div class="text-xs text-gray-500">2023.06.14 · 조회 96</div>
+                                </div>
+                            </div>
+                            <div class="badge badge-blue">질문</div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">장기 계획과 단기 계획을 어떻게 조화시키나요?</h3>
+                        <p class="text-gray-600 mb-4">장기 목표와 단기 목표 사이에서 균형을 잡기가 어렵습니다. 특히 단기 목표를 달성하면서도 장기 목표를 위한 시간을
+                            확보하는 방법이 궁금합니다...</p>
+                        <div class="flex text-sm text-gray-500 gap-3">
+                            <div class="reaction-button">
+                                <i class="far fa-thumbs-up"></i> 좋아요 12
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-comment"></i> 댓글 15
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-bookmark"></i> 저장
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 게시글 3 -->
+                    <div class="bg-white rounded-lg shadow-sm p-5 post-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <img src="https://picsum.photos/id/1027/40/40" alt="프로필" class="avatar avatar-sm">
+                                <div>
+                                    <div class="font-medium">이유진</div>
+                                    <div class="text-xs text-gray-500">2023.06.12 · 조회 203</div>
+                                </div>
+                            </div>
+                            <div class="badge badge-yellow">성취</div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">3개월 만에 토익 900점 달성한 공부 계획 공유</h3>
+                        <p class="text-gray-600 mb-4">안녕하세요! 저는 3개월 전 토익 700점에서 시작해 900점을 달성했습니다. 꿈터의 계획 관리 기능을 활용해 매일
+                            2시간씩 꾸준히 공부했는데요...</p>
+                        <div class="flex text-sm text-gray-500 gap-3">
+                            <div class="reaction-button">
+                                <i class="far fa-thumbs-up"></i> 좋아요 87
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-comment"></i> 댓글 26
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-bookmark"></i> 저장
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 게시글 4 -->
+                    <div class="bg-white rounded-lg shadow-sm p-5 post-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <img src="https://picsum.photos/id/1035/40/40" alt="프로필" class="avatar avatar-sm">
+                                <div>
+                                    <div class="font-medium">정민우</div>
+                                    <div class="text-xs text-gray-500">2023.06.10 · 조회 156</div>
+                                </div>
+                            </div>
+                            <div class="badge badge-green">꿀팁</div>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">초보자를 위한 달력 활용법</h3>
+                        <p class="text-gray-600 mb-4">계획을 세우는 것은 쉽지만 실천하는 것은 어렵죠. 저는 꿈터의 달력 기능을 활용해 계획을 시각화하는 방법을 알려드리려고
+                            합니다...</p>
+                        <div class="flex text-sm text-gray-500 gap-3">
+                            <div class="reaction-button">
+                                <i class="far fa-thumbs-up"></i> 좋아요 45
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-comment"></i> 댓글 12
+                            </div>
+                            <div class="reaction-button">
+                                <i class="far fa-bookmark"></i> 저장
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div class="flex justify-center my-8">
+                    <nav class="flex items-center space-x-1">
+                        <a href="#" class="p-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </a>
+                        <a href="#" class="px-3 py-2 rounded-md border border-gray-300 bg-pastel-green text-white">1</a>
+                        <a href="#"
+                            class="px-3 py-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">2</a>
+                        <a href="#"
+                            class="px-3 py-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">3</a>
+                        <a href="#"
+                            class="px-3 py-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">4</a>
+                        <a href="#"
+                            class="px-3 py-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">5</a>
+                        <a href="#" class="p-2 rounded-md border border-gray-300 text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 사이드바 -->
+            <div class="w-full md:w-1/3">
+                <!-- 인기 게시글 -->
+                <div class="bg-white rounded-lg shadow-sm p-5 mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">인기 게시글</h2>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#" class="flex items-start hover:text-pastel-green-darker transition">
+                                <span class="text-xl font-bold text-gray-300 mr-3">1</span>
+                                <span class="line-clamp-2">초보자도 쉽게 따라할 수 있는 하루 일과 계획 세우기</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-start hover:text-pastel-green-darker transition">
+                                <span class="text-xl font-bold text-gray-300 mr-3">2</span>
+                                <span class="line-clamp-2">계획은 실천이 중요해요! 5년간 꾸준히 계획 지킨 비결</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-start hover:text-pastel-green-darker transition">
+                                <span class="text-xl font-bold text-gray-300 mr-3">3</span>
+                                <span class="line-clamp-2">학업과 취미를 병행하는 꿀팁 대방출</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-start hover:text-pastel-green-darker transition">
+                                <span class="text-xl font-bold text-gray-300 mr-3">4</span>
+                                <span class="line-clamp-2">독서, 운동, 공부를 모두 하는 방법</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-start hover:text-pastel-green-darker transition">
+                                <span class="text-xl font-bold text-gray-300 mr-3">5</span>
+                                <span class="line-clamp-2">효율적인 시간 관리를 위한 템플릿 공유</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 태그 클라우드 -->
+                <div class="bg-white rounded-lg shadow-sm p-5 mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">인기 태그</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="#" class="card-tag hover:bg-gray-100">시간관리</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">생산성</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">공부법</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">목표달성</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">습관화</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">성공사례</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">동기부여</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">아침루틴</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">건강관리</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">자기계발</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">집중력</a>
+                        <a href="#" class="card-tag hover:bg-gray-100">템플릿</a>
+                    </div>
+                </div>
+
+                <!-- 활발한 사용자 -->
+                <div class="bg-white rounded-lg shadow-sm p-5">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">활발한 사용자</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-center">
+                            <img src="https://picsum.photos/id/1005/40/40" alt="프로필" class="avatar avatar-md mr-3">
+                            <div>
+                                <div class="font-medium">김철수</div>
+                                <div class="text-xs text-gray-500">게시글 28 · 댓글 152</div>
+                            </div>
+                        </li>
+                        <li class="flex items-center">
+                            <img src="https://picsum.photos/id/1012/40/40" alt="프로필" class="avatar avatar-md mr-3">
+                            <div>
+                                <div class="font-medium">박지민</div>
+                                <div class="text-xs text-gray-500">게시글 24 · 댓글 103</div>
+                            </div>
+                        </li>
+                        <li class="flex items-center">
+                            <img src="https://picsum.photos/id/1027/40/40" alt="프로필" class="avatar avatar-md mr-3">
+                            <div>
+                                <div class="font-medium">이유진</div>
+                                <div class="text-xs text-gray-500">게시글 19 · 댓글 87</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 커뮤니티 탭 전환 기능
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.community-tab');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    // 현재 활성화된 탭에서 active 클래스 제거
+                    document.querySelector('.community-tab.active').classList.remove('active');
+                    // 클릭된 탭에 active 클래스 추가
+                    this.classList.add('active');
+
+                    const tabName = this.getAttribute('data-tab');
+                    console.log(`Tab switched to: ${tabName}`);
+                    // 실제 구현에서는 여기서 해당 탭에 맞는 게시글 데이터를 불러와야 함
+                });
+            });
+
+            // 반응 버튼 (좋아요, 댓글, 저장) 기능
+            const reactionButtons = document.querySelectorAll('.reaction-button');
+            reactionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    const buttonText = this.textContent.trim();
+
+                    // 좋아요 버튼이면 아이콘 변경 (빈 하트 <-> 채워진 하트)
+                    if (buttonText.includes('좋아요')) {
+                        if (icon.classList.contains('far')) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                    }
+
+                    // 저장 버튼이면 아이콘 변경 (빈 북마크 <-> 채워진 북마크)
+                    if (buttonText.includes('저장')) {
+                        if (icon.classList.contains('far')) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

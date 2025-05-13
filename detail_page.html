@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제주도 일주일 여행 계획 - 꿈터(KkumTeo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <!-- 공통 JavaScript 모듈 추가 -->
+    <script src="includes/script.js"></script>
+    <script>
+        // tailwind 설정
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-green': 'var(--pastel-green)',
+                        'pastel-green-dark': 'var(--pastel-green-darker)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        :root {
+            --pastel-green: #A8E6CE;
+            --pastel-green-darker: #7DCFB6;
+            --pastel-green-focus-shadow: rgba(168, 230, 206, 0.5);
+            --form-input-border: #d1d5db;
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 4px;
+            color: #4b5563;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .header-search-input {
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            width: 200px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--pastel-green);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .page-layout-container {
+            display: flex;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 2rem auto;
+            align-items: flex-start;
+        }
+
+        .content-wrapper-main {
+            flex-grow: 1;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+            padding: 2.5rem;
+        }
+
+        .sidebar-wrapper {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-widget {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            /* padding은 헤더와 콘텐츠 영역에서 개별적으로 처리 */
+        }
+
+        .sidebar-widget-header {
+            /* 위젯 제목과 토글 버튼을 감싸는 div */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            /* 헤더 영역 패딩 */
+            cursor: pointer;
+            /* 헤더 전체 클릭 가능하도록 */
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-widget-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0;
+            /* 헤더 div에서 관리하므로 제거 */
+            padding-bottom: 0;
+            /* 헤더 div에서 관리하므로 제거 */
+            border-bottom: none;
+            /* 헤더 div에서 관리하므로 제거 */
+        }
+
+        .widget-toggle-button {
+            background: none;
+            border: none;
+            padding: 0.25rem;
+            cursor: pointer;
+            display: flex;
+            /* 아이콘 정렬을 위해 */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trapezoid-icon {
+            width: 10px;
+            /* 너비 조정 */
+            height: 10px;
+            /* 높이 조정 */
+            background-color: var(--text-color-muted, #6b7280);
+            clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+            /* 위가 넓은 사다리꼴 (아래 화살표 느낌) */
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .widget-toggle-button[aria-expanded="true"] .trapezoid-icon {
+            transform: rotate(180deg);
+            /* 위로 회전 (열림 표시) */
+            background-color: var(--pastel-green-darker);
+        }
+
+        .widget-content {
+            /* 접고 펴질 콘텐츠 영역 */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            /* 패딩도 트랜지션 */
+            padding: 0 1.5rem;
+            /* 닫혔을 때 상하 패딩 0 */
+        }
+
+        .widget-content.expanded {
+            max-height: 1000px;
+            /* 충분히 큰 값으로 설정 */
+            padding: 1rem 1.5rem;
+            /* 열렸을 때 상하 패딩 */
+            border-top: 1px solid #f3f4f6;
+            /* 헤더와 콘텐츠 구분선 (열렸을때만) */
+        }
+
+        .sidebar-widget ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            /* widget-content의 패딩으로 관리 */
+        }
+
+        .sidebar-widget ul li a {
+            color: var(--pastel-green-darker);
+            text-decoration: none;
+            font-size: 0.925rem;
+            padding: 0.375rem 0;
+            display: block;
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-widget ul li a:hover {
+            color: var(--pastel-green);
+            text-decoration: underline;
+        }
+
+        .sidebar-tags {
+            /* 태그 컨테이너도 widget-content 내부로 */
+            margin: 0;
+            /* widget-content의 패딩으로 관리 */
+        }
+
+        .sidebar-tags a {
+            display: inline-block;
+            background-color: var(--pastel-green-focus-shadow);
+            color: var(--pastel-green-darker);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+            border: 1px solid var(--pastel-green);
+        }
+
+        .sidebar-tags a:hover {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+
+        .sidebar-widget .ad-banner-link img {
+            /* 광고 배너 이미지 스타일 */
+            width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            /* 이미지에도 둥근 모서리 */
+            display: block;
+            /* 이미지 하단 여백 제거 */
+        }
+
+
+        /* 모바일 반응형 스타일 */
+        @media (max-width: 1023px) {
+            .page-layout-container {
+                flex-direction: column;
+                gap: 0;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .content-wrapper-main {
+                width: 100%;
+                max-width: none;
+                margin-bottom: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .sidebar-wrapper {
+                width: 100%;
+                position: static;
+                top: auto;
+            }
+
+            .sidebar-widget {
+                margin-bottom: 1rem;
+                /* 모바일에서 위젯 간 간격 줄임 */
+            }
+
+            /* 모바일에서는 기본적으로 접혀있도록 .widget-content에 expanded 클래스가 없을 때의 스타일 적용 */
+        }
+
+        /* 데스크탑에서는 항상 펼쳐져 있도록 (선택 사항, JS로 제어하거나 이 미디어쿼리 사용) */
+        @media (min-width: 1024px) {
+            .sidebar-wrapper {
+                position: sticky;
+                top: 80px;
+            }
+
+            .widget-content {
+                /* 데스크탑에서는 항상 펼침 */
+                max-height: 1000px;
+                padding: 1rem 1.5rem;
+                border-top: 1px solid #f3f4f6;
+            }
+
+            .widget-toggle-button {
+                /* 데스크탑에서는 토글 버튼 숨김 (선택 사항) */
+                /* display: none; */
+            }
+        }
+
+
+        .artwork-header-style2 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .artwork-title-style2 {
+            font-size: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .artwork-title-style2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .artwork-meta-style2 {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .artwork-meta-style2 .creator-name-link {
+            font-weight: 500;
+            color: var(--pastel-green-darker);
+            text-decoration: none;
+        }
+
+        .artwork-meta-style2 .creator-name-link:hover {
+            text-decoration: underline;
+        }
+
+        .creator-profile-inline {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .creator-profile-inline img {
+            margin-right: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .creator-profile-inline .follow-button-inline {
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .creator-profile-inline {
+                flex-direction: row;
+                text-align: left;
+                align-items: center;
+            }
+
+            .creator-profile-inline img {
+                margin-right: 1.25rem;
+                margin-bottom: 0;
+            }
+
+            .creator-profile-inline .follow-button-inline {
+                margin-left: auto;
+                margin-top: 0;
+            }
+        }
+
+        .creator-avatar-medium {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--pastel-green);
+        }
+
+        .creator-info-text .name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+
+        .creator-info-text .bio {
+            font-size: 0.925rem;
+            color: #6b7280;
+        }
+
+        .follow-button-inline {
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .follow-button-inline:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .artwork-description-style2 {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #374151;
+            margin-bottom: 2.5rem;
+            text-align: justify;
+        }
+
+        @media (min-width: 768px) {
+            .artwork-description-style2 {
+                font-size: 1.05rem;
+                line-height: 1.9;
+            }
+        }
+
+        .artwork-description-style2 p {
+            margin-bottom: 1.25rem;
+        }
+
+        .artwork-description-style2 p:last-child {
+            margin-bottom: 0;
+        }
+
+        .inline-images-section {
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+            .inline-images-section {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        .inline-image-item img {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .inline-image-item img:hover {
+            transform: scale(1.05);
+        }
+
+        .artwork-tags-style2 {
+            text-align: left;
+            margin-bottom: 2.5rem;
+        }
+
+        .artwork-tag-style2 {
+            display: inline-block;
+            background-color: var(--pastel-green-focus-shadow);
+            color: var(--pastel-green-darker);
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0.5rem 0.25rem 0;
+            border: 1px solid var(--pastel-green);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .artwork-tag-style2:hover {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+
+        .action-buttons-inline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .action-buttons-inline {
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        .action-button-style2 {
+            background-color: transparent;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-button-style2:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+            color: #374151;
+        }
+
+        .action-button-style2.liked {
+            border-color: var(--pastel-green-darker);
+            background-color: var(--pastel-green-focus-shadow);
+            color: var(--pastel-green-darker);
+        }
+
+        .action-button-style2.liked i {
+            color: var(--pastel-green-darker);
+        }
+
+        .opinions-section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 2rem;
+        }
+
+        .opinions-title {
+            font-size: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .opinions-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .opinion-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .opinion-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .opinion-item:last-child {
+            border-bottom: none;
+        }
+
+        .opinion-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .opinion-content-wrapper {
+            flex-grow: 1;
+        }
+
+        .opinion-author {
+            font-weight: 600;
+            color: #111827;
+            margin-right: 0.5rem;
+        }
+
+        .opinion-timestamp {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .opinion-text-content,
+        .opinion-html-content {
+            font-size: 0.875rem;
+            color: #374151;
+            margin-top: 0.25rem;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .opinion-html-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .opinion-form {
+            margin-top: 0rem;
+        }
+
+        .opinion-input-type-toggle {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .opinion-input-type-toggle label {
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .opinion-input-type-toggle input[type="radio"] {
+            margin-right: 0.25rem;
+            accent-color: var(--pastel-green);
+        }
+
+        .opinion-form textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            font-size: 0.925rem;
+            resize: vertical;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .opinion-form textarea:focus {
+            outline: none;
+            border-color: var(--pastel-green);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .opinion-form-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opinion-submit-button {
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .opinion-submit-button:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .opinion-media-options {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .opinion-media-button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.875rem;
+            padding: 0.375rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .opinion-media-button:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .opinion-attachments {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .opinion-attachment-item {
+            position: relative;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .opinion-attachment-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .opinion-attachment-remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .opinion-attachment-remove:hover {
+            background-color: rgba(239, 68, 68, 0.8);
+        }
+
+        .opinion-figma-preview {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+            margin-top: 0.75rem;
+        }
+
+        .opinion-figma-preview i {
+            font-size: 1.25rem;
+            color: #9333ea;
+            margin-right: 0.5rem;
+        }
+
+        .opinion-figma-preview-text {
+            flex-grow: 1;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .opinion-figma-preview-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .opinion-media-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Responsive adjustments for opinion form media options */
+        @media (max-width: 640px) {
+            .opinion-form-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+
+            .opinion-media-options {
+                justify-content: space-between;
+                order: -1;
+            }
+
+            .opinion-submit-button {
+                width: 100%;
+            }
+        }
+
+        /* 오디오 컨텐츠 스타일 */
+        .audio-content-section {
+            margin-top: 2rem;
+        }
+
+        .audio-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+
+        .audio-tab-button {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .audio-tab-button.active {
+            color: var(--pastel-green-darker);
+            font-weight: 500;
+        }
+
+        .audio-tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--pastel-green);
+        }
+
+        .audio-item {
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .audio-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 오디오 플레이어 스타일 */
+        .audio-player {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            outline: none;
+        }
+
+        .audio-download-btn {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--pastel-green-darker);
+            text-decoration: none;
+        }
+
+        .audio-download-btn i {
+            margin-right: 0.25rem;
+        }
+
+        /* 로딩 스피너 스타일 */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* 알림 스타일 */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-success {
+            background-color: var(--pastel-green);
+        }
+
+        .notification-error {
+            background-color: #e74c3c;
+        }
+
+        .notification-warning {
+            background-color: #f39c12;
+        }
+
+        .notification-info {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link active">계획</a>
+                    <a href="calendar.html" class="nav-link">달력</a>
+                    <a href="community.html" class="nav-link">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" placeholder="검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">홍길동님</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-layout-container px-4 sm:px-6 lg:px-8">
+        <div class="content-wrapper-main">
+            <header class="artwork-header-style2">
+                <h1 class="artwork-title-style2">숲 속의 작은 집</h1>
+                <p class="artwork-meta-style2">
+                    <a href="#" class="creator-name-link">숲의 화가</a> · <span class="artwork-date">2025.05.10</span>
+                </p>
+            </header>
+
+            <section class="creator-profile-inline">
+                <img src="https://placehold.co/60x60/8EBFAC/FFFFFF?text=숲" alt="크리에이터 아바타"
+                    class="creator-avatar-medium">
+                <div class="creator-info-text">
+                    <div class="name">숲의 화가 (Forest Painter)</div>
+                    <div class="bio">자연의 아름다움과 신비로움을 그리는 것을 좋아합니다.</div>
+                </div>
+                <a href="#" class="follow-button-inline">팔로우하기</a>
+            </section>
+
+            <article class="artwork-description-style2">
+                <p>고요한 숲 속에 자리 잡은 작은 오두막집을 상상하며 그린 작품입니다. 새벽녘의 부드러운 안개와 따스하게 스며드는 햇살, 그리고 지저귀는 새소리가 들리는 듯한 평화로운 순간을
+                    표현하고자 했습니다. 이 오두막은 바쁜 일상에서 벗어나 자연 속에서 휴식을 취할 수 있는 안식처를 상징합니다.</p>
+                <p>작업 과정에서는 주로 수채화 기법을 디지털로 재현하려 노력했으며, 빛과 그림자의 미묘한 변화를 통해 깊이감을 더했습니다. 특히 나무의 질감과 다양한 식물들의 형태를 섬세하게 묘사하는
+                    데 중점을 두었습니다.</p>
+
+                <div class="inline-images-section">
+                    <div class="inline-image-item">
+                        <img src="https://placehold.co/400x300/A7D7C5/FFFFFF?text=스케치+과정" alt="스케치 과정 이미지">
+                    </div>
+                    <div class="inline-image-item">
+                        <img src="https://placehold.co/400x300/8EBFAC/FFFFFF?text=색상+테스트" alt="색상 테스트 이미지">
+                    </div>
+                    <div class="inline-image-item">
+                        <img src="https://placehold.co/400x300/C5E1A5/FFFFFF?text=부분+확대" alt="부분 확대 이미지">
+                    </div>
+                </div>
+
+                <p>이 그림을 통해 많은 분들이 잠시나마 마음의 평화를 느끼고, 자연이 주는 위안을 받으셨으면 좋겠습니다. 앞으로도 자연을 주제로 한 다양한 작품들을 선보일 예정이니 많은 관심
+                    부탁드립니다.</p>
+            </article>
+
+            <section class="artwork-tags-style2">
+                <span class="artwork-tag-style2">#숲</span>
+                <span class="artwork-tag-style2">#오두막</span>
+                <span class="artwork-tag-style2">#자연</span>
+                <span class="artwork-tag-style2">#일러스트</span>
+                <span class="artwork-tag-style2">#평화</span>
+                <span class="artwork-tag-style2">#힐링</span>
+                <span class="artwork-tag-style2">#디지털페인팅</span>
+            </section>
+
+            <!-- 오디오 컨텐츠 섹션 -->
+            <section class="audio-content-section mb-8 border-t border-gray-200 pt-6">
+                <h2 class="text-xl font-semibold mb-4 flex justify-between items-center">
+                    <span>오디오 콘텐츠</span>
+                    <button id="addAudioBtn"
+                        class="px-3 py-1 bg-[var(--pastel-green)] text-white rounded-md text-sm font-medium flex items-center">
+                        <i class="fas fa-plus mr-1"></i> 오디오 추가
+                    </button>
+                </h2>
+
+                <!-- 오디오 업로드 폼 (기본적으로 숨겨져 있음) -->
+                <div id="audioUploadForm" class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                    style="display: none;">
+                    <div class="mb-3">
+                        <label for="audioTitle" class="block text-sm font-medium text-gray-700 mb-1">제목</label>
+                        <input type="text" id="audioTitle"
+                            class="w-full p-2 text-sm border rounded-md focus:outline-none focus:border-[var(--pastel-green)] focus:ring-1 focus:ring-[var(--pastel-green-focus-shadow)]"
+                            placeholder="오디오 제목을 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label for="audioDescription" class="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                        <textarea id="audioDescription"
+                            class="w-full p-2 text-sm border rounded-md focus:outline-none focus:border-[var(--pastel-green)] focus:ring-1 focus:ring-[var(--pastel-green-focus-shadow)]"
+                            rows="2" placeholder="간단한 설명을 입력하세요"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="audioType" class="block text-sm font-medium text-gray-700 mb-1">유형</label>
+                        <select id="audioType"
+                            class="w-full p-2 text-sm border rounded-md focus:outline-none focus:border-[var(--pastel-green)] focus:ring-1 focus:ring-[var(--pastel-green-focus-shadow)]">
+                            <option value="podcast">팟캐스트</option>
+                            <option value="mp3">오디오 해설 (MP3)</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="audioFile" class="block text-sm font-medium text-gray-700 mb-1">오디오 파일</label>
+                        <div class="file-upload-wrapper cursor-pointer border border-dashed rounded-md p-3 text-center hover:border-[var(--pastel-green)] transition-colors"
+                            onclick="document.getElementById('audioFile').click()">
+                            <input type="file" id="audioFile" class="hidden" accept="audio/mp3,audio/mpeg">
+                            <i class="fas fa-music text-gray-400 text-lg mb-1"></i>
+                            <p class="text-sm text-gray-500" id="audioFileName">클릭하여 오디오 파일 선택</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button id="cancelAudioUpload"
+                            class="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">취소</button>
+                        <button id="confirmAudioUpload"
+                            class="px-3 py-2 bg-[var(--pastel-green)] text-white rounded-md text-sm hover:bg-[var(--pastel-green-darker)]">등록</button>
+                    </div>
+                </div>
+
+                <div class="audio-tabs mb-4">
+                    <div class="flex border-b">
+                        <button
+                            class="audio-tab-button px-4 py-2 border-b-2 border-[var(--pastel-green)] text-[var(--pastel-green-darker)] font-medium">
+                            팟캐스트
+                        </button>
+                        <button class="audio-tab-button px-4 py-2 text-gray-500 hover:text-gray-700">
+                            오디오 해설
+                        </button>
+                    </div>
+                </div>
+
+                <div class="audio-content-container">
+                    <!-- 팟캐스트 탭 컨텐츠 -->
+                    <div class="audio-tab-content active">
+                        <div class="audio-item p-3 bg-gray-50 rounded-lg mb-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <h3 class="text-md font-medium">자연 속 힐링 - 작가의 생각</h3>
+                                    <p class="text-xs text-gray-500">5:54 · 팟캐스트</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">
+                                자연을 주제로 한 작품을 그리는 과정에서 느낀 작가의 생각과 감정을 담은 팟캐스트 에피소드입니다.
+                            </p>
+                            <audio controls class="w-full">
+                                <source src="/uploads/audio/nature_healing_podcast.mp3" type="audio/mpeg">
+                                브라우저가 오디오 재생을 지원하지 않습니다.
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 오디오 해설 탭 컨텐츠 -->
+                    <div class="audio-tab-content hidden">
+                        <div class="audio-item p-3 bg-gray-50 rounded-lg mb-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <div>
+                                    <h3 class="text-md font-medium">숲 속의 작은 집 - 작업 과정 이야기</h3>
+                                    <p class="text-xs text-gray-500">3:00 · MP3</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">
+                                작품의 영감을 얻게 된 과정과 실제 작업 진행 방식에 대한 오디오 설명입니다.
+                            </p>
+                            <audio controls class="w-full">
+                                <source src="/uploads/audio/forest_cabin_process.mp3" type="audio/mpeg">
+                                브라우저가 오디오 재생을 지원하지 않습니다.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="action-buttons-inline">
+                <button class="action-button-style2" id="likeActionBtn">
+                    <i class="far fa-heart"></i> <span>좋아요 (123)</span>
+                </button>
+                <button class="action-button-style2">
+                    <i class="fas fa-share-alt"></i> <span>공유하기</span>
+                </button>
+                <button class="action-button-style2">
+                    <i class="far fa-bookmark"></i> <span>북마크</span>
+                </button>
+            </section>
+
+            <section class="opinions-section">
+                <h2 class="opinions-title">의견 <span id="opinionCount">(2)</span></h2>
+                <ul id="opinionList" class="opinion-list">
+                    <li class="opinion-item">
+                        <img src="https://placehold.co/40x40/FFA726/FFFFFF?text=댓" alt="의견 작성자 아바타"
+                            class="opinion-avatar">
+                        <div class="opinion-content-wrapper">
+                            <div>
+                                <span class="opinion-author">의견러1</span>
+                                <span class="opinion-timestamp">2시간 전</span>
+                            </div>
+                            <div class="opinion-text-content">정말 아름다운 작품이네요! 숲 속의 평화로움이 그대로 느껴집니다.</div>
+                        </div>
+                    </li>
+                    <li class="opinion-item">
+                        <img src="https://placehold.co/40x40/42A5F5/FFFFFF?text=글" alt="의견 작성자 아바타"
+                            class="opinion-avatar">
+                        <div class="opinion-content-wrapper">
+                            <div>
+                                <span class="opinion-author">창작팬</span>
+                                <span class="opinion-timestamp">어제</span>
+                            </div>
+                            <div class="opinion-html-content">스케치 과정도 볼 수 있어서 좋네요! 다음 작품도 기대하겠습니다 :) <br> 추가로,
+                                <strong>이런 강조</strong>나 <i>이탤릭체</i>도 잘 보이면 좋겠어요. <img
+                                    src="https://placehold.co/100x50/eeeeee/999999?text=HTML+이미지" alt="HTML 의견 내 이미지">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="opinion-item">
+                        <img src="https://placehold.co/40x40/4CAF50/FFFFFF?text=디" alt="의견 작성자 아바타"
+                            class="opinion-avatar">
+                        <div class="opinion-content-wrapper">
+                            <div>
+                                <span class="opinion-author">디자이너</span>
+                                <span class="opinion-timestamp">오늘</span>
+                            </div>
+                            <div class="opinion-text-content">제가 작업한 시안을 공유드립니다. 피드백 부탁드려요!</div>
+                            <div class="opinion-images"
+                                style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                <div
+                                    style="position: relative; width: 100px; height: 100px; border-radius: 0.375rem; overflow: hidden;">
+                                    <img src="https://placehold.co/100x100/A7D7C5/FFFFFF?text=시안1" alt="첨부 이미지"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div
+                                    style="position: relative; width: 100px; height: 100px; border-radius: 0.375rem; overflow: hidden;">
+                                    <img src="https://placehold.co/100x100/8EBFAC/FFFFFF?text=시안2" alt="첨부 이미지"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+                            <div class="opinion-figma-link"
+                                style="margin-top: 0.5rem; padding: 0.5rem; background-color: #f9fafb; border-radius: 0.375rem; border: 1px solid #e5e7eb; display: flex; align-items: center;">
+                                <i class="fab fa-figma"
+                                    style="font-size: 1.25rem; color: #9333ea; margin-right: 0.5rem;"></i>
+                                <a href="https://figma.com/file/example" target="_blank"
+                                    style="font-size: 0.875rem; color: #4f46e5; text-decoration: none;"
+                                    title="https://figma.com/file/example">
+                                    Figma 링크 123
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <form id="opinionForm" class="opinion-form">
+                    <div class="opinion-input-type-toggle">
+                        <label>
+                            <input type="radio" name="opinionType" value="text" checked> 텍스트
+                        </label>
+                        <label>
+                            <input type="radio" name="opinionType" value="html"> HTML
+                        </label>
+                    </div>
+                    <textarea id="newOpinionText" placeholder="따뜻한 의견을 남겨주세요..." rows="3" required
+                        class="opinion-form textarea"></textarea>
+
+                    <!-- 첨부 파일 미리보기 영역 -->
+                    <div id="opinionAttachments" class="opinion-attachments"></div>
+
+                    <!-- Figma 링크 미리보기 영역 -->
+                    <div id="opinionFigmaPreview" class="opinion-figma-preview" style="display: none;">
+                        <i class="fab fa-figma"></i>
+                        <span class="opinion-figma-preview-text" id="opinionFigmaPreviewText"></span>
+                        <button type="button" class="opinion-figma-preview-remove" id="opinionFigmaRemoveBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="opinion-form-actions">
+                        <div class="opinion-media-options">
+                            <!-- 이미지 업로드 버튼 -->
+                            <label for="opinionImageUpload" class="opinion-media-button">
+                                <i class="far fa-image"></i>
+                                <span>이미지</span>
+                            </label>
+                            <input type="file" id="opinionImageUpload" accept="image/*" multiple
+                                class="opinion-media-input">
+
+                            <!-- Figma 링크 버튼 -->
+                            <button type="button" id="opinionFigmaBtn" class="opinion-media-button">
+                                <i class="fab fa-figma"></i>
+                                <span>Figma</span>
+                            </button>
+                        </div>
+                        <button type="submit" class="opinion-submit-button">의견 등록</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <aside class="sidebar-wrapper">
+            <div class="sidebar-widget">
+                <div class="sidebar-widget-header">
+                    <h3 class="sidebar-widget-title">시안 파일 업로드</h3>
+                    <button class="widget-toggle-button" aria-expanded="false"
+                        aria-controls="widget-content-design-upload">
+                        <span class="trapezoid-icon"></span>
+                    </button>
+                </div>
+                <div class="widget-content" id="widget-content-design-upload">
+                    <div class="design-upload-options">
+                        <!-- HTML 파일 업로드 섹션 -->
+                        <div class="upload-section mb-3">
+                            <h4 class="text-sm font-medium mb-1">HTML 파일 업로드</h4>
+                            <div class="file-upload-wrapper cursor-pointer border border-dashed rounded-md p-2 text-center hover:border-[var(--pastel-green)] transition-colors"
+                                onclick="document.getElementById('designHtmlFile').click()">
+                                <input type="file" id="designHtmlFile" class="hidden" accept=".html,.htm" multiple>
+                                <i class="fas fa-file-code text-gray-400 text-sm mb-1"></i>
+                                <p class="text-xs text-gray-500">클릭하여 HTML 파일 선택</p>
+                            </div>
+                            <div id="htmlFileNameDisplay"
+                                class="text-xs text-gray-600 mt-1 p-1 bg-gray-50 rounded-md hidden"></div>
+                        </div>
+
+                        <!-- Figma 링크 등록 섹션 -->
+                        <div class="upload-section mb-3">
+                            <h4 class="text-sm font-medium mb-1">Figma 링크 등록</h4>
+                            <div class="figma-input-wrapper">
+                                <input type="text" id="figmaLink" placeholder="Figma 링크 입력 후 Enter"
+                                    class="w-full p-2 text-sm border rounded-md focus:outline-none focus:border-[var(--pastel-green)] focus:ring-1 focus:ring-[var(--pastel-green-focus-shadow)]">
+                            </div>
+                        </div>
+
+                        <!-- 오디오 파일 업로드 섹션 - 제거됨 -->
+
+                        <!-- 등록된 파일 목록 섹션 -->
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <h4 class="text-sm font-medium mb-2">등록된 시안 파일 목록</h4>
+                            <ul id="uploadedFilesList" class="text-xs border rounded-md divide-y hidden">
+                                <!-- 동적으로 생성됨 -->
+                            </ul>
+                            <div id="noFilesMessage" class="text-xs text-gray-500 p-2 text-center border rounded-md">
+                                등록된 파일이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-widget">
+                <div class="sidebar-widget-header">
+                    <h3 class="sidebar-widget-title">인기 태그</h3>
+                    <button class="widget-toggle-button" aria-expanded="false"
+                        aria-controls="widget-content-popular-tags">
+                        <span class="trapezoid-icon"></span>
+                    </button>
+                </div>
+                <div class="widget-content" id="widget-content-popular-tags">
+                    <div class="sidebar-tags">
+                        <a href="#">#여행</a> <a href="#">#힐링</a> <a href="#">#DIY</a>
+                        <a href="#">#레시피</a> <a href="#">#공부</a> <a href="#">#운동</a>
+                        <a href="#">#사진</a> <a href="#">#개발</a> <a href="#">#디자인</a>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-widget">
+                <div class="sidebar-widget-header">
+                    <h3 class="sidebar-widget-title">광고 배너 (예시)</h3>
+                    <button class="widget-toggle-button" aria-expanded="false" aria-controls="widget-content-ad-banner">
+                        <span class="trapezoid-icon"></span>
+                    </button>
+                </div>
+                <div class="widget-content" id="widget-content-ad-banner">
+                    <a href="#" class="ad-banner-link">
+                        <img src="https://placehold.co/268x200/A7D7C5/FFFFFF?text=광고+배너" alt="광고 배너">
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 페이지 하단 JavaScript 코드 추가 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 오디오 관련 요소
+            const audioTabButtons = document.querySelectorAll('.audio-tab-button');
+            const audioTabContents = document.querySelectorAll('.audio-tab-content');
+            const addAudioBtn = document.getElementById('addAudioBtn');
+            const audioUploadForm = document.getElementById('audioUploadForm');
+            const audioTitleInput = document.getElementById('audioTitle');
+            const audioDescInput = document.getElementById('audioDescription');
+            const audioTypeSelect = document.getElementById('audioType');
+            const audioFileInput = document.getElementById('audioFile');
+            const confirmAudioUpload = document.getElementById('confirmAudioUpload');
+            const cancelAudioUpload = document.getElementById('cancelAudioUpload');
+            const audioFileName = document.getElementById('audioFileName');
+
+            // 현재 URL에서 plan_id 추출 (실제 구현에서는 이런 방식으로 ID를 가져올 수 있음)
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPlanId = urlParams.get('id') || 1; // 기본값 1 (개발/테스트용)
+
+            // 오디오 파일 선택 시 파일명 표시
+            if (audioFileInput) {
+                audioFileInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        audioFileName.textContent = file.name;
+
+                        // 파일 형식 검사
+                        const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav'];
+                        if (!validTypes.includes(file.type)) {
+                            KkumTeo.UIUtils.showNotification('지원하지 않는 오디오 파일 형식입니다. MP3, OGG, WAV만 지원합니다.', 'error');
+                            this.value = '';
+                            audioFileName.textContent = '클릭하여 오디오 파일 선택';
+                            return;
+                        }
+
+                        // 파일 크기 제한 (30MB)
+                        if (file.size > 30 * 1024 * 1024) {
+                            KkumTeo.UIUtils.showNotification('파일 크기는 30MB 이하여야 합니다.', 'error');
+                            this.value = '';
+                            audioFileName.textContent = '클릭하여 오디오 파일 선택';
+                            return;
+                        }
+                    } else {
+                        audioFileName.textContent = '클릭하여 오디오 파일 선택';
+                    }
+                });
+            }
+
+            // 오디오 탭 전환 기능
+            if (audioTabButtons.length > 0) {
+                audioTabButtons.forEach((button, index) => {
+                    button.addEventListener('click', function () {
+                        // 탭 버튼 활성화 상태 변경
+                        audioTabButtons.forEach(btn => {
+                            btn.classList.remove('border-b-2', 'border-[var(--pastel-green)]', 'text-[var(--pastel-green-darker)]', 'font-medium');
+                            btn.classList.add('text-gray-500', 'hover:text-gray-700');
+                        });
+                        this.classList.remove('text-gray-500', 'hover:text-gray-700');
+                        this.classList.add('border-b-2', 'border-[var(--pastel-green)]', 'text-[var(--pastel-green-darker)]', 'font-medium');
+
+                        // 탭 콘텐츠 표시/숨김
+                        audioTabContents.forEach((content, i) => {
+                            if (i === index) {
+                                content.classList.remove('hidden');
+                                content.classList.add('active');
+                            } else {
+                                content.classList.add('hidden');
+                                content.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // 오디오 추가 버튼 클릭
+            if (addAudioBtn && audioUploadForm) {
+                addAudioBtn.addEventListener('click', function () {
+                    if (audioUploadForm.style.display === 'none' || audioUploadForm.style.display === '') {
+                        audioUploadForm.style.display = 'block';
+                        // 입력 필드 초기화
+                        if (audioTitleInput) audioTitleInput.value = '';
+                        if (audioDescInput) audioDescInput.value = '';
+                        if (audioTypeSelect) audioTypeSelect.value = 'podcast';
+                        if (audioFileInput) {
+                            audioFileInput.value = '';
+                            audioFileName.textContent = '클릭하여 오디오 파일 선택';
+                        }
+                    } else {
+                        audioUploadForm.style.display = 'none';
+                    }
+                });
+            }
+
+            // 오디오 업로드 취소
+            if (cancelAudioUpload && audioUploadForm) {
+                cancelAudioUpload.addEventListener('click', function () {
+                    audioUploadForm.style.display = 'none';
+                });
+            }
+
+            // 오디오 업로드 제출
+            if (confirmAudioUpload && audioUploadForm) {
+                confirmAudioUpload.addEventListener('click', async function () {
+                    // 필수 필드 검사
+                    if (!audioTitleInput.value.trim()) {
+                        KkumTeo.UIUtils.showNotification('제목을 입력해주세요.', 'error');
+                        audioTitleInput.focus();
+                        return;
+                    }
+
+                    if (!audioFileInput.files[0]) {
+                        alert('오디오 파일을 선택해주세요.');
+                        audioFileInput.focus();
+                        return;
+                    }
+
+                    // 폼 데이터 준비
+                    const metadata = {
+                        title: audioTitleInput.value,
+                        description: audioDescInput.value,
+                        audio_type: audioTypeSelect.value
+                    };
+
+                    try {
+                        // 로딩 표시
+                        const loadingSpinner = KkumTeo.UIUtils.showLoading(audioUploadForm, '오디오 파일 업로드 중...');
+
+                        // 업로드 API 호출
+                        const result = await KkumTeo.AudioManager.uploadAudio(
+                            currentPlanId,
+                            audioFileInput.files[0],
+                            metadata
+                        );
+
+                        // 로딩 제거
+                        KkumTeo.UIUtils.hideLoading(loadingSpinner);
+
+                        if (result.success) {
+                            // 성공 메시지
+                            KkumTeo.UIUtils.showNotification(result.message, 'success');
+
+                            // 폼 초기화 및 숨김
+                            audioUploadForm.style.display = 'none';
+                            audioTitleInput.value = '';
+                            audioDescInput.value = '';
+                            audioTypeSelect.value = 'mp3';
+                            audioFileInput.value = '';
+
+                            // 오디오 목록 갱신
+                            loadAudioFiles();
+                        } else {
+                            // 오류 메시지
+                            KkumTeo.UIUtils.showNotification(result.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error('오디오 업로드 오류:', error);
+                        KkumTeo.UIUtils.showNotification('오디오 파일 업로드 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            }
+
+            // 오디오 파일 목록 로드 함수
+            async function loadAudioFiles() {
+                try {
+                    // 팟캐스트 로드
+                    const podcastContainer = document.getElementById('podcastList');
+                    if (podcastContainer) {
+                        const loadingSpinner = KkumTeo.UIUtils.showLoading(podcastContainer, '팟캐스트 로드 중...');
+
+                        const podcastResult = await KkumTeo.AudioManager.getAudioList(currentPlanId, 'podcast');
+
+                        KkumTeo.UIUtils.hideLoading(loadingSpinner);
+
+                        if (podcastResult.success) {
+                            renderAudioList(podcastContainer, podcastResult.audio_files);
+                        }
+                    }
+
+                    // 오디오 해설 로드
+                    const audioCommentaryContainer = document.getElementById('audioCommentaryList');
+                    if (audioCommentaryContainer) {
+                        const loadingSpinner = KkumTeo.UIUtils.showLoading(audioCommentaryContainer, '오디오 해설 로드 중...');
+
+                        const audioResult = await KkumTeo.AudioManager.getAudioList(currentPlanId, 'mp3');
+
+                        KkumTeo.UIUtils.hideLoading(loadingSpinner);
+
+                        if (audioResult.success) {
+                            renderAudioList(audioCommentaryContainer, audioResult.audio_files);
+                        }
+                    }
+                } catch (error) {
+                    console.error('오디오 목록 로드 오류:', error);
+                    KkumTeo.UIUtils.showNotification('오디오 목록을 불러오는 중 오류가 발생했습니다.', 'error');
+                }
+            }
+
+            // 오디오 목록 렌더링 함수
+            function renderAudioList(container, audioFiles) {
+                container.innerHTML = '';
+
+                if (!audioFiles || audioFiles.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">등록된 오디오가 없습니다.</p>';
+                    return;
+                }
+
+                audioFiles.forEach(audio => {
+                    const audioItem = document.createElement('div');
+                    audioItem.className = 'audio-item bg-white rounded-lg shadow-sm mb-3 p-3';
+                    audioItem.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-medium text-gray-800">${audio.title}</h4>
+                                <p class="text-sm text-gray-500">${audio.description || ''}</p>
+                                <div class="text-xs text-gray-400 mt-1">
+                                    <span>${audio.duration_formatted}</span>
+                                    <span class="mx-1">|</span>
+                                    <span>${audio.file_size_formatted}</span>
+                                </div>
+                            </div>
+                            <button class="delete-audio-btn text-red-500 hover:text-red-700" data-audio-id="${audio.audio_id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="audio-player-container mt-2"></div>
+                    `;
+
+                    container.appendChild(audioItem);
+
+                    // 오디오 플레이어 생성
+                    const playerContainer = audioItem.querySelector('.audio-player-container');
+                    const player = KkumTeo.UIUtils.createAudioPlayer(audio.file_path, {
+                        className: 'w-full',
+                        showDownload: true
+                    });
+                    playerContainer.appendChild(player);
+
+                    // 삭제 버튼 이벤트 리스너
+                    const deleteBtn = audioItem.querySelector('.delete-audio-btn');
+                    deleteBtn.addEventListener('click', function () {
+                        const audioId = this.getAttribute('data-audio-id');
+                        deleteAudio(audioId);
+                    });
+                });
+            }
+
+            // 오디오 삭제 함수
+            async function deleteAudio(audioId) {
+                KkumTeo.UIUtils.showConfirm('정말로 이 오디오 파일을 삭제하시겠습니까?', async () => {
+                    try {
+                        const result = await KkumTeo.AudioManager.deleteAudio(audioId);
+
+                        if (result.success) {
+                            KkumTeo.UIUtils.showNotification(result.message, 'success');
+                            loadAudioFiles(); // 목록 갱신
+                        } else {
+                            KkumTeo.UIUtils.showNotification(result.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error('오디오 삭제 오류:', error);
+                        KkumTeo.UIUtils.showNotification('오디오 삭제 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            }
+
+            // 초기 오디오 파일 목록 로드
+            loadAudioFiles();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 계획 대시보드 - 꿈터(KkumTeo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="common.css">
+    <!-- 공통 스크립트 로드 -->
+    <script src="includes/script.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        :root {
+            --pastel-green: #A7D7C5;
+            --pastel-green-darker: #8EBFAC;
+            --pastel-green-focus-shadow: rgba(167, 215, 197, 0.3);
+            --form-input-border: #d1d5db;
+            --form-input-focus-border: var(--pastel-green);
+            --danger-red: #ef4444;
+            --danger-red-darker: #dc2626;
+        }
+
+        .nav-link {
+            position: relative;
+            padding-bottom: 4px;
+            color: #4b5563;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            /* 활성 링크 및 호버 시 스타일 */
+            color: var(--pastel-green-darker);
+        }
+
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            /* 활성 링크 및 호버 시 하단 선 */
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:not(.active)::after {
+            /* 비활성 링크는 호버 시에만 선 표시 */
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--pastel-green);
+            transition: width 0.3s ease;
+        }
+
+        .header-search-input {
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            width: 200px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        /* 사용자 프로필/대시보드 요약 섹션 스타일 */
+        .dashboard-header {
+            background-color: white;
+            padding: 2rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            /* Tailwind gray-200 */
+        }
+
+        .dashboard-profile {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .dashboard-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--pastel-green);
+        }
+
+        .dashboard-greeting h2 {
+            font-size: 1.875rem;
+            /* text-3xl */
+            font-weight: 700;
+            color: #1f2937;
+            /* text-gray-800 */
+        }
+
+        .dashboard-greeting p {
+            font-size: 1rem;
+            color: #6b7280;
+            /* text-gray-500 */
+        }
+
+        .profile-edit-link {
+            color: var(--pastel-green-darker);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .profile-edit-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 나의 계획서 목록 제목 및 새 계획서 버튼 섹션 */
+        .my-plans-header-section {
+            background-color: #f8f9fa;
+            /* body 배경색과 동일하게 */
+            padding: 2rem 0;
+        }
+
+        .my-plans-title-actions {
+            display: flex;
+            flex-direction: column;
+            /* 모바일에서는 수직 정렬 */
+            align-items: flex-start;
+            /* 모바일에서는 왼쪽 정렬 */
+            gap: 1rem;
+            /* 제목과 버튼 사이 간격 */
+        }
+
+        @media (min-width: 640px) {
+
+            /* sm 이상 화면에서는 수평 정렬 */
+            .my-plans-title-actions {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .my-plans-title-actions h1 {
+            font-size: 1.875rem;
+            /* text-3xl, 기존 2xl에서 키움 */
+            font-weight: 700;
+            /* 기존 bold에서 700으로 명시 */
+            color: #1f2937;
+            /* text-gray-800 */
+        }
+
+        .create-plan-button {
+            display: inline-flex;
+            /* 아이콘과 텍스트 정렬 */
+            align-items: center;
+            background-color: var(--pastel-green);
+            color: white;
+            font-weight: 500;
+            /* 기존 semibold에서 500으로 */
+            padding: 0.625rem 1.25rem;
+            /* py-2.5 px-5 느낌 */
+            border-radius: 0.5rem;
+            /* 기존 rounded-lg 보다 약간 더 둥글게 */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            /* Tailwind shadow */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+        }
+
+        .create-plan-button:hover {
+            background-color: var(--pastel-green-darker);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            /* Tailwind shadow-md */
+        }
+
+        .create-plan-button i {
+            margin-right: 0.5rem;
+        }
+
+        .plan-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #f3f4f6;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-3px);
+            border-color: #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .plan-card-image {
+            width: 100%;
+            height: 15rem;
+            object-fit: cover;
+        }
+
+        .plan-card-content {
+            padding: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .plan-card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.625rem;
+            line-height: 1.3;
+            text-decoration: none;
+        }
+
+        .plan-card-title:hover {
+            color: var(--pastel-green-darker);
+        }
+
+        .plan-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin-bottom: 0.875rem;
+            flex-grow: 1;
+        }
+
+        .plan-card-tag {
+            background-color: transparent;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.125rem 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+        }
+
+        .plan-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.625rem;
+            border-top: 1px solid #f3f4f6;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .plan-card-actions button {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .edit-button {
+            background-color: #e9ecef;
+            color: #4b5563;
+        }
+
+        .edit-button:hover {
+            background-color: #d1d5db;
+        }
+
+        .delete-button {
+            background-color: #fee2e2;
+            color: var(--danger-red);
+        }
+
+        .delete-button:hover {
+            background-color: #fecaca;
+            color: var(--danger-red-darker);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-button:hover {
+            color: #6b7280;
+        }
+
+        .modal-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--form-input-border);
+            border-radius: 0.375rem;
+            font-size: 1rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--form-input-focus-border);
+            box-shadow: 0 0 0 2px var(--pastel-green-focus-shadow);
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-button {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-button-primary {
+            background-color: var(--pastel-green);
+            color: white;
+        }
+
+        .modal-button-primary:hover {
+            background-color: var(--pastel-green-darker);
+        }
+
+        .modal-button-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal-button-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        /* 알림 스타일 추가 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1100;
+            color: white;
+            max-width: 300px;
+            transform: translateY(-30px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            background-color: #10b981;
+        }
+
+        .notification-error {
+            background-color: #ef4444;
+        }
+
+        .notification-warning {
+            background-color: #f59e0b;
+        }
+
+        .notification-info {
+            background-color: #3b82f6;
+        }
+
+        /* 로딩 스피너 스타일 */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            vertical-align: -0.125em;
+            border: 0.25em solid var(--pastel-green);
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="main_page.html" class="text-2xl font-bold text-gray-800">꿈터</a>
+                </div>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="main_page.html" class="nav-link active">계획</a>
+                    <a href="calendar.html" class="nav-link">달력</a>
+                    <a href="community.html" class="nav-link">커뮤니티</a>
+                </nav>
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="headerSearchInput" placeholder="내 계획서 검색..." class="header-search-input">
+                    <div class="h-5 border-r border-gray-300"></div>
+                    <div id="userSection">
+                        <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                            <span id="userName">로딩 중...</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="dashboard-header">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="dashboard-profile">
+                <img src="https://placehold.co/80x80/A7D7C5/FFFFFF?text=U" alt="사용자 아바타" class="dashboard-avatar"
+                    id="userAvatar">
+                <div class="dashboard-greeting">
+                    <h2 id="userGreeting">안녕하세요!</h2>
+                    <p>오늘도 멋진 계획을 세워보세요.</p>
+                    <a href="#" class="profile-edit-link" id="profileEditLink">프로필 수정 <i
+                            class="fas fa-chevron-right fa-xs ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="my-plans-header-section">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="my-plans-title-actions">
+                <h1>나의 계획서</h1>
+                <a href="plan_editor.html" class="create-plan-button">
+                    <i class="fas fa-plus"></i>새 계획서 만들기
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="myPlansGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- 로딩 인디케이터 -->
+            <div id="loadingPlans" class="col-span-full my-12 text-center">
+                <div class="spinner-border text-primary mx-auto" role="status"></div>
+                <p class="mt-4 text-gray-600">계획 목록을 불러오는 중...</p>
+            </div>
+
+            <!-- 계획이 없을 때 메시지 -->
+            <div id="noPlansMessage" class="col-span-full text-center py-12 hidden">
+                <i class="fas fa-folder-open fa-3x text-gray-400 mb-4"></i>
+                <p class="text-xl text-gray-600 mb-2">아직 작성된 계획서가 없습니다.</p>
+                <p class="text-gray-500">오른쪽 위의 '새 계획서 만들기' 버튼을 눌러 첫 계획서를 작성해보세요!</p>
+            </div>
+
+            <!-- 계획 카드들이 여기에 동적으로 추가됩니다 -->
+        </div>
+    </main>
+
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">로그인</h2>
+                <button id="closeLoginModalButton" class="modal-close-button" aria-label="닫기">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="modal-input-group">
+                    <label for="username" class="modal-label">아이디</label>
+                    <input type="text" id="username" name="username" class="modal-input" required>
+                </div>
+                <div class="modal-input-group">
+                    <label for="password" class="modal-label">비밀번호</label>
+                    <input type="password" id="password" name="password" class="modal-input" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelLoginButton" class="modal-button modal-button-secondary">취소</button>
+                    <button type="submit" class="modal-button modal-button-primary">로그인</button>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="#" class="text-sm text-theme-green hover:underline">아이디/비밀번호 찾기</a>
+                    <span class="text-sm text-gray-400 mx-1">|</span>
+                    <a href="#" class="text-sm text-theme-green hover:underline">회원가입</a>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="kakaoLoginBtn"
+                        class="w-full bg-yellow-300 text-gray-800 py-2 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-comment mr-2"></i> 카카오 계정으로 로그인
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // DOM 요소 참조
+            const myPlansGrid = document.getElementById('myPlansGrid');
+            const loadingPlans = document.getElementById('loadingPlans');
+            const noPlansMessage = document.getElementById('noPlansMessage');
+            const headerSearchInput = document.getElementById('headerSearchInput');
+            const userSection = document.getElementById('userSection');
+            const userName = document.getElementById('userName');
+            const userGreeting = document.getElementById('userGreeting');
+            const userAvatar = document.getElementById('userAvatar');
+            const loginModal = document.getElementById('loginModal');
+            const loginForm = document.getElementById('loginForm');
+            const kakaoLoginBtn = document.getElementById('kakaoLoginBtn');
+
+            // 상태 변수
+            let currentUser = null;
+            let myPlans = [];
+            let isLoading = false;
+
+            // 사용자 정보 로드
+            async function loadCurrentUser() {
+                try {
+                    const response = await KkumTeo.AuthManager.getCurrentUser();
+
+                    if (response.success && response.user) {
+                        currentUser = response.user;
+
+                        // 사용자 정보 UI 업데이트
+                        userName.textContent = currentUser.name + '님';
+                        userGreeting.textContent = `안녕하세요, ${currentUser.name}님!`;
+
+                        if (currentUser.avatar_url) {
+                            userAvatar.src = currentUser.avatar_url;
+                        }
+
+                        // 로그아웃 옵션 추가
+                        userSection.innerHTML = `
+                            <div class="relative group">
+                                <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 flex items-center">
+                                    <span>${currentUser.name}님</span>
+                                </a>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+                                    <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</a>
+                                </div>
+                            </div>
+                        `;
+
+                        // 로그아웃 이벤트 리스너
+                        document.getElementById('logoutButton').addEventListener('click', async function (e) {
+                            e.preventDefault();
+
+                            try {
+                                const response = await KkumTeo.AuthManager.logout();
+
+                                if (response.success) {
+                                    KkumTeo.UIUtils.showNotification('로그아웃 되었습니다.', 'success');
+                                    window.location.href = 'main_page.html';
+                                } else {
+                                    KkumTeo.UIUtils.showNotification(response.message || '로그아웃 실패', 'error');
+                                }
+                            } catch (error) {
+                                console.error('로그아웃 오류:', error);
+                                KkumTeo.UIUtils.showNotification('로그아웃 중 오류가 발생했습니다.', 'error');
+                            }
+                        });
+                    } else {
+                        // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+                        window.location.href = 'main_page.html';
+                    }
+                } catch (error) {
+                    console.error('사용자 정보 로드 오류:', error);
+                    KkumTeo.UIUtils.showNotification('사용자 정보를 불러오는데 실패했습니다.', 'error');
+                    window.location.href = 'main_page.html';
+                }
+            }
+
+            // 내 계획 목록 로드
+            async function loadMyPlans() {
+                if (isLoading) return;
+
+                isLoading = true;
+                loadingPlans.classList.remove('hidden');
+                noPlansMessage.classList.add('hidden');
+
+                // 기존 계획 카드 제거 (로딩, 무계획 메시지 제외)
+                const existingCards = myPlansGrid.querySelectorAll('.plan-card');
+                existingCards.forEach(card => card.remove());
+
+                try {
+                    // 사용자 소유의 계획만 필터링
+                    const response = await KkumTeo.PlanManager.getPlans({
+                        user_id: currentUser ? currentUser.id : 0
+                    }, 50, 0, 'latest');
+
+                    if (response.success) {
+                        myPlans = response.plans;
+                        renderMyPlans(myPlans);
+                    } else {
+                        KkumTeo.UIUtils.showNotification(response.message || '계획을 불러오는데 실패했습니다.', 'error');
+                        noPlansMessage.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('계획 로드 오류:', error);
+                    KkumTeo.UIUtils.showNotification('계획을 불러오는데 실패했습니다.', 'error');
+                    noPlansMessage.classList.remove('hidden');
+                } finally {
+                    loadingPlans.classList.add('hidden');
+                    isLoading = false;
+                }
+            }
+
+            // 검색 기능
+            function performHeaderSearch() {
+                const searchTerm = headerSearchInput.value.toLowerCase().trim();
+                const filteredPlans = searchTerm === '' ? myPlans : myPlans.filter(plan => {
+                    const titleMatch = plan.title.toLowerCase().includes(searchTerm);
+                    const tagMatch = plan.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                    return titleMatch || tagMatch;
+                });
+
+                renderMyPlans(filteredPlans);
+            }
+
+            if (headerSearchInput) {
+                headerSearchInput.addEventListener('input', performHeaderSearch);
+            }
+
+            // 계획 카드 렌더링
+            function renderMyPlans(plansToRender) {
+                // 로딩 및 무계획 메시지 제어
+                loadingPlans.classList.add('hidden');
+
+                if (plansToRender.length === 0) {
+                    noPlansMessage.classList.remove('hidden');
+                    return;
+                }
+
+                noPlansMessage.classList.add('hidden');
+
+                // 기존 계획 카드 제거
+                const existingCards = myPlansGrid.querySelectorAll('.plan-card');
+                existingCards.forEach(card => card.remove());
+
+                // 계획 카드 생성
+                plansToRender.forEach(plan => {
+                    const card = createPlanCard(plan);
+                    // 로딩 표시 앞에 카드 삽입
+                    myPlansGrid.insertBefore(card, loadingPlans);
+                });
+            }
+
+            // 계획 카드 생성
+            function createPlanCard(plan) {
+                const card = document.createElement('div');
+                card.className = 'plan-card';
+                card.dataset.id = plan.id;
+
+                // 태그 HTML 생성
+                const tagsHtml = plan.tags.map(tag =>
+                    `<span class="plan-card-tag">#${tag}</span>`
+                ).join('');
+
+                // 날짜 포맷팅
+                const formattedDate = KkumTeo.UIUtils.formatDate(plan.created_at, 'YY.MM.DD');
+
+                card.innerHTML = `
+                    <a href="detail_page.html?id=${plan.id}">
+                        <img src="${plan.image_url || 'https://placehold.co/600x400/A7D7C5/FFFFFF?text=계획'}" 
+                             alt="${plan.title}" class="plan-card-image">
+                    </a>
+                    <div class="plan-card-content">
+                        <h3 class="plan-card-title"><a href="detail_page.html?id=${plan.id}">${plan.title}</a></h3>
+                        <div class="plan-card-tags">
+                            ${tagsHtml}
+                        </div>
+                        <div class="plan-card-footer">
+                            <span>${formattedDate}</span>
+                            <div class="plan-card-actions">
+                                <button class="edit-button" onclick="location.href='plan_editor.html?id=${plan.id}'">수정</button>
+                                <button class="delete-button" data-plan-id="${plan.id}">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // 삭제 버튼에 이벤트 리스너 추가
+                const deleteButton = card.querySelector('.delete-button');
+                deleteButton.addEventListener('click', function () {
+                    confirmDelete(plan.id);
+                });
+
+                return card;
+            }
+
+            // 계획 삭제 확인
+            function confirmDelete(planId) {
+                KkumTeo.UIUtils.showConfirm("정말로 이 계획서를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.", async () => {
+                    try {
+                        const response = await KkumTeo.PlanManager.deletePlan(planId);
+
+                        if (response.success) {
+                            KkumTeo.UIUtils.showNotification('계획서가 삭제되었습니다.', 'success');
+
+                            // 삭제된 계획을 배열에서 제거하고 UI 갱신
+                            myPlans = myPlans.filter(plan => plan.id !== planId);
+
+                            // 해당 카드를 DOM에서 제거
+                            const cardToRemove = document.querySelector(`.plan-card[data-id="${planId}"]`);
+                            if (cardToRemove) {
+                                cardToRemove.remove();
+                            }
+
+                            // 배열이 비었으면 "계획 없음" 메시지 표시
+                            if (myPlans.length === 0) {
+                                noPlansMessage.classList.remove('hidden');
+                            }
+                        } else {
+                            KkumTeo.UIUtils.showNotification(response.message || '계획서 삭제 실패', 'error');
+                        }
+                    } catch (error) {
+                        console.error('계획 삭제 오류:', error);
+                        KkumTeo.UIUtils.showNotification('계획서 삭제 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            }
+
+            // 초기화 함수
+            async function init() {
+                await loadCurrentUser();
+
+                if (currentUser) {
+                    await loadMyPlans();
+                }
+            }
+
+            // 페이지 초기화
+            init();
+        });
+    </script>
+
+</body>
+
+</html>
